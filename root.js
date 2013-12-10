@@ -72,10 +72,10 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         }
     })
     //new user
-    .state('new', { 
+    .state('newuser', { 
         url: "/new",
-        templateUrl: "page/new/template.html",
-        controller: 'New_Controller',
+        templateUrl: "page/newuser/template.html",
+        controller: 'Newuser_Controller',
         resolve: {
             libraries : function($q) {
                 var deferred = $q.defer();
@@ -87,10 +87,10 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         }
     })
     //add a game
-    .state('add', {
+    .state('addgame', {
         url: "/add",
-        templateUrl: "page/add/template.html",
-        controller: 'Add_Controller',
+        templateUrl: "page/addgame/template.html",
+        controller: 'Addgame_Controller',
         resolve: {
             libraries : function($q) {
                 var deferred = $q.defer();

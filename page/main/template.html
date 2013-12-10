@@ -1,20 +1,19 @@
 <div class="container" id="main_view">
 	<div id="game_head" class="row">
 		<!-- <img class="pull-left" src="/htdocs/img/logo.png"/> -->
-		<h1 class="pull-left">{{userdata.company.name}}</h1>
+		<h1 class="pull-left">{{data.userdata.company.name}}</h1>
 		<div class="pull-right tabbable tabs-below">
 			<ul class="nav nav-pills">
-        		<li class="disabled"><a href="#">${{userdata.company.currency}}</a></li>
-        		<li class="disabled"><a href="#">£{{userdata.company.prem_currency}}</a></li>
-        		<li class="disabled"><a href="#">{{userdata.company.xp}}xp</a></li>
-        		<li class="disabled"><a href="#">{{userdata.company.level}}</a></li>
+        		<li class="disabled"><a href="#">${{data.userdata.company.currency}}</a></li>
+        		<li class="disabled"><a href="#">£{{data.userdata.company.prem_currency}}</a></li>
+        		<li class="disabled"><a href="#">{{data.userdata.company.xp}}xp</a></li>
+        		<li class="disabled"><a href="#">{{data.userdata.company.level}}</a></li>
         		<li class="divider"></li>
         		<li class="active"><a href="#">SHOP</a></li>
         	</ul>
 		</div>
 	</div>
-	<div id="game_progress" class="row">
-		<button class="btn btn-primary" type="button">ADD GAME</button>
+	<div id="game_progress" class="{{game_slot_state()}}" ng-click="game_slot_click()" class="row">
 	</div>
 	<div id="game_space" class="row">
 		<div id="game_studio" class="span8">

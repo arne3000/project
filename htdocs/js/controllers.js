@@ -3,27 +3,34 @@
 ************************/
 //login
 function Login_Controller($scope, $state, libraries, database) { 
+	/*
+			NEED TO MAKE IT SO USERS ARE INFORMED THAT THIS IS AN EXPERIMENT AND MADE AWARE OF THE FOLLOWING THINGS
+			 -metric data is kept
+			 -no personal information is stored
+
+			HAVE AN OPTION TO EITHER CONTINUE TO GAME OR EXIT
+	*/
 	database.initialise($scope, "user", "data");
 	$scope.$watch('data', function() {
 	    if (typeof $scope.data != "undefined") {
-		    if (typeof $scope.data.userdata === "undefined") {
-		    	$state.go('new');
-		    } else {
+		    if (typeof $scope.data.userdata === "undefined")
+		    	$state.go('newuser');
+		    else
 		    	$state.go('main');
-		    }
 		}
 	});
 };
 
 //new user
-function New_Controller($scope, libraries) {
+function Newuser_Controller($scope, $state, libraries, database) {
 	console.log("new");
 	//$rootscope.userdata = Helper.initUserData();
+
 };
 
 
 //add a new game
-function Add_Controller($scope, libraries) {
+function Addgame_Controller($scope, libraries) {
 	console.log("add");
 
 };
@@ -140,12 +147,23 @@ function Worker_Controller($scope, libraries) {
 
 //main game loop
 function Main_Controller($scope, $state, $timeout, $modal, $log, libraries, database) {
+	console.log(libraries);
 	database.bind($scope, "data", function() { $state.go('login'); });
 
-	console.log(libraries);
-	var mytimeout = $timeout($scope.onTimeout,1000);
-	$scope.slots.setWorkers($scope.data.userdata.workers);
-
+	$scope.game_slot_state = function() {
+		if (typeof $scope.data != "undefined") {
+			if (typeof $scope.data.userdata.activegame === "undefined")
+				return "state_empty";
+			else
+				return "state_active";
+		}
+	};
+	$scope.game_slot_click = function() {
+		if (typeof $scope.data != "undefined") {
+			if (typeof $scope.data.userdata.activegame === "undefined")
+				$state.go("addgame");
+		}
+	};
 	$scope.slot_completed = function(workerid) {
 		$scope.data.userdata.workers[workerid].timestamp = 0;
 		$scope.slots.setWorkers($scope.data.userdata.workers);
@@ -161,14 +179,21 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, libraries, data
 			$scope.slots.setWorkers($scope.data.userdata.workers);
 		});
 	};
-	$scope.slots = new slots($scope.slot_completed, $scope.slot_empty, function(id) {
-		$state.go("worker/"+id);
-	});
-
 	$scope.onTimeout = function(){
     	$scope.slots.update();
         mytimeout = $timeout($scope.onTimeout,1000);
     };
+
+
+    $scope.$watch('data', function() {
+		if (typeof $scope.data != "undefined") {
+			$scope.slots = new slots($scope.slot_completed, $scope.slot_empty, function(id) {
+				$state.go("worker/"+id);
+			});
+			$scope.slots.setWorkers($scope.data.userdata.workers);
+			var mytimeout = $timeout($scope.onTimeout,1000);
+		}
+	});
 };
 
 

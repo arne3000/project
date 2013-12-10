@@ -83,10 +83,32 @@ html, body, #outer_wrap, #main_view {
     }
     #game_progress {
         height: 8%;
-        .ui_style();
         margin-top: 0.5%;
         margin-bottom: 0.5%;
-        text-align: center;
+        //background-color: #F8F8F8;
+        .rounded(5px);
+        position: relative;
+        &.state_empty {
+            border-style: dashed;
+            border-width: 5px;
+            border-color: #C7C7C7;
+            &:after {
+                content: "Click to Add Game";
+                text-align: center;
+                position: absolute;
+                top: 50%; bottom: 50%; left: 0; right: 0;
+                line-height: 0;
+                font-size: 30px;
+                color: #999;
+            }
+            &:hover {
+                background-color: #F1F1F1;
+                cursor: pointer;
+            }
+        }
+        &.state_active {
+            
+        }
     }
     #game_space {
         height: 79%;
@@ -110,7 +132,7 @@ html, body, #outer_wrap, #main_view {
                     background-image: url('../img/worker/filled_desk.png');
                     &.slot_empty { background-image: url('../img/worker/blank_desk.png'); }
                     &.slot_completed { background-image: url('../img/worker/completed_desk.png'); }
-                    &:hover { .opacity(0.6); }
+                    &:hover { .opacity(0.6); cursor: pointer; }
                 }
             }
         }
