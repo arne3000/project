@@ -1,0 +1,23 @@
+/* CSS crunched with Crunch - http://crunchapp.net/ */
+html,body,#outer_wrap,#main_view{background-color:#E8E6E3;height:100%}
+.nav,.pagination,.carousel a{cursor:pointer}
+.state_inactive{display:none !important}
+.pro_bar_out{width:100%;height:20px;background-color:#C7C7C7;position:relative}.pro_bar_out p{position:absolute;right:0;left:0;text-align:center}
+.pro_bar_out .pro_bar_in{background-color:green;position:absolute;top:0;left:0;right:100%;bottom:0}
+.modal-header .level_bar{width:100%;height:20px}.modal-header .level_bar .pro_bar_out{float:left;width:80%;margin-top:5px;height:10px}.modal-header .level_bar .pro_bar_out .pro_bar_in{background-color:#D14B4B}
+.modal-header .level_bar .leftside{float:left;width:9%;text-align:right;padding-right:1%}
+.modal-header .level_bar .rightside{float:left;width:9%;padding-left:1%}
+.modal-half{width:48%;padding:1%;float:left}
+.stat_outer{width:100%;height:100px;background-image:url('../img/stat_grid.png');-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;position:relative}.stat_outer .stat{position:absolute;width:20%;top:100%;bottom:0}.stat_outer .stat.stat_Innovation{left:10%;background-color:#31AFE0}
+.stat_outer .stat.stat_Optimisation{left:40%;background-color:#F7DC40}
+.stat_outer .stat.stat_Quality{left:70%;background-color:#E0319A}
+.stat_outer .stat:hover{cursor:pointer}
+#main_view.state_notloaded{background-position:center center;background-size:auto auto;background-repeat:no-repeat;position:absolute;top:0;left:0;right:0;bottom:0;background-image:url('../img/loading.gif')}
+#main_view #game_head{height:10%}#main_view #game_head img{height:100%}
+#main_view #game_progress{height:8%;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;background:#7e7e7e;background:-webkit-gradient(linear, left bottom, left top, color-stop(0, #989898), color-stop(1, #7e7e7e));background:-ms-linear-gradient(bottom, #989898, #7e7e7e);background:-moz-linear-gradient(center bottom, #989898 0, #7e7e7e 100%);background:-o-linear-gradient(#7e7e7e, #989898);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#7e7e7e', endColorstr='#989898', GradientType=0);border-top:solid 1px #cbcbcb;border-left:solid 1px #7e7e7e;border-right:solid 1px #7e7e7e;border-bottom:solid 1px #323232;-webkit-box-shadow:0 1px 2px rgba(0,0,0,0.2);-moz-box-shadow:0 1px 2px rgba(0,0,0,0.2);box-shadow:0 1px 2px rgba(0,0,0,0.2);margin-top:0.5%;margin-bottom:0.5%;text-align:center}
+#main_view #game_space{height:79%}#main_view #game_space #game_studio{height:100%}#main_view #game_space #game_studio .slot_output{width:31%;height:31%;margin:2% 2% 0 0;position:relative;float:left}#main_view #game_space #game_studio .slot_output .collect .pro_bar_in{background-color:#79D669}
+#main_view #game_space #game_studio .slot_output .collect.slot_inactive,#main_view #game_space #game_studio .slot_output .collect.slot_empty,#main_view #game_space #game_studio .slot_output .collect.slot_completed{display:none}
+#main_view #game_space #game_studio .slot_output .desk{background-size:100% auto;background-repeat:no-repeat;position:absolute;top:23px;left:0;right:0;bottom:0;background-image:url('../img/worker/filled_desk.png')}#main_view #game_space #game_studio .slot_output .desk.slot_empty{background-image:url('../img/worker/blank_desk.png')}
+#main_view #game_space #game_studio .slot_output .desk.slot_completed{background-image:url('../img/worker/completed_desk.png')}
+#main_view #game_space #game_studio .slot_output .desk:hover{-moz-opacity:.6;-khtml-opacity:.6;-webkit-opacity:.6;opacity:.6;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(opacity=60);filter:alpha(opacity=60)}
+#main_view #game_space #game_history{height:100%;margin-left:0px;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;background:#7e7e7e;background:-webkit-gradient(linear, left bottom, left top, color-stop(0, #989898), color-stop(1, #7e7e7e));background:-ms-linear-gradient(bottom, #989898, #7e7e7e);background:-moz-linear-gradient(center bottom, #989898 0, #7e7e7e 100%);background:-o-linear-gradient(#7e7e7e, #989898);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#7e7e7e', endColorstr='#989898', GradientType=0);border-top:solid 1px #cbcbcb;border-left:solid 1px #7e7e7e;border-right:solid 1px #7e7e7e;border-bottom:solid 1px #323232;-webkit-box-shadow:0 1px 2px rgba(0,0,0,0.2);-moz-box-shadow:0 1px 2px rgba(0,0,0,0.2);box-shadow:0 1px 2px rgba(0,0,0,0.2)}
