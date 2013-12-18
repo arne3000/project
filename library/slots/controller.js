@@ -23,18 +23,20 @@ function slots(event_completed, event_empty, event_else) {
 
 	this.setWorkers = function(workerArray) {
 		this.construct();
-		for (i = 0; i < workerArray.length; ++i) {
-			if (typeof workerArray[i] != "undefined") {
-				this.data[workerArray[i].slotid].workerid = i;
-				if (workerArray[i].timestamp > 0) {
-					this.data[workerArray[i].slotid].timemax = Levels.toCollectTime(workerArray[i].level);
-					var timeleft = Helper.calculateTimeleft(workerArray[i].timestamp, this.data[workerArray[i].slotid].timemax);
-					if (timeleft > 0) {
-						this.data[workerArray[i].slotid].state = this.states.busy;
-						this.data[workerArray[i].slotid].timeleft = timeleft;
-					} else {
-						this.data[workerArray[i].slotid].state = this.states.completed;
-					}				
+		if (typeof workerArray != "undefined") {
+			for (i = 0; i < workerArray.length; ++i) {
+				if (typeof workerArray[i] != "undefined") {
+					this.data[workerArray[i].slotid].workerid = i;
+					if (workerArray[i].timestamp > 0) {
+						this.data[workerArray[i].slotid].timemax = Levels.toCollectTime(workerArray[i].level);
+						var timeleft = Helper.calculateTimeleft(workerArray[i].timestamp, this.data[workerArray[i].slotid].timemax);
+						if (timeleft > 0) {
+							this.data[workerArray[i].slotid].state = this.states.busy;
+							this.data[workerArray[i].slotid].timeleft = timeleft;
+						} else {
+							this.data[workerArray[i].slotid].state = this.states.completed;
+						}				
+					}
 				}
 			}
 		}

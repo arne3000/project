@@ -89,5 +89,27 @@ var Levels = {
 	},
 	toWorkQuality : function(level) {
 		return Levels.calculate(level, Levels.data.work.quality);
+	},
+
+
+	generateData : function(worker_level) {
+		return {
+			relevance: Levels.toRelevance(worker_level),
+			collect : { 
+				amount: Levels.toCollectAmount(),
+				cost : Levels.toCollectCost(worker_level),
+				prem : Levels.toCollectPrem(worker_level),
+				time : Levels.toCollectTime(worker_level)
+			},
+			progress : {
+				amount: Levels.toProgressAmount(),
+				cost: Levels.toProgressCost(worker_level)
+			},
+			work : { 
+				innovation : Levels.toWorkInnovation(worker_level),
+				optimisation : Levels.toWorkOptimisation(worker_level),
+				quality : Levels.toWorkQuality(worker_level)
+			}
+		};
 	}
 };

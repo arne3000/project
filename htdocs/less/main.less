@@ -1,73 +1,26 @@
-@import "elements.less";
+/**********************
+MAIN FILE WHICH TO COMPILE FROM
+***********************/
 
+
+/**********************
+PREREQUISITES
+***********************/
+@import "elements.less";
+@import "gameobjects.less";
+
+.nav, .pagination, .carousel a { cursor: pointer; }
+.state_inactive { display: none !important; }
 html, body, #outer_wrap, #main_view { 
     background-color: #E8E6E3;
     height: 100%;
 }
-.nav, .pagination, .carousel a { cursor: pointer; }
-
-.ui_style(@colour: #7E7E7E) {
-    .rounded(5px);
-    .gradient(@colour, lighten(@colour, 10%), @colour);
-    .bordered(lighten(@colour, 30%), @colour, darken(@colour, 30%), @colour);
-    .drop-shadow(0, 1px, 2px, 0.2);
-}
-
-.state_inactive { display: none !important; }
-.pro_bar_out {
-    width: 100%;
-    height: 20px;
-    background-color: #C7C7C7;
-    position: relative;
-    p { 
-        position: absolute; 
-        right: 0; left: 0;
-        text-align: center;
-    }
-    .pro_bar_in {
-        background-color: green;
-        position: absolute;
-        top: 0; left: 0; right: 100%; bottom: 0;
-    }
-}
-.modal-header {
-    .level_bar {
-        width: 100%;
-        height: 20px;
-        .pro_bar_out {
-            float: left;
-            width: 80%;
-            margin-top: 5px;
-            height: 10px;
-            .pro_bar_in { background-color: #D14B4B; }
-        }
-        .leftside { float: left; width: 9%; text-align: right; padding-right: 1%; }
-        .rightside { float: left; width: 9%; padding-left: 1%; }
-    }
-}
-.modal-half {
-    width: 48%;
-    padding: 1%;
-    float: left;
-}
-.stat_outer {
-    width: 100%;
-    height: 100px;
-    background-image: url('../img/stat_grid.png');
-    .rounded(3px);
-    position: relative;
-    .stat {
-        position: absolute;
-        width: 20%;
-        top: 100%; bottom: 0;
-        &.stat_Innovation { left: 10%; background-color: #31AFE0; }
-        &.stat_Optimisation { left: 40%; background-color: #F7DC40; }
-        &.stat_Quality { left: 70%; background-color: #E0319A; }
-        &:hover { cursor: pointer; }
-    }
-}
 
 
+
+/**********************
+SETUP MAIN GAME PAGES
+***********************/
 #main_view {
     &.state_notloaded {
         background-position: center center;
@@ -85,7 +38,6 @@ html, body, #outer_wrap, #main_view {
         height: 8%;
         margin-top: 0.5%;
         margin-bottom: 0.5%;
-        //background-color: #F8F8F8;
         .rounded(5px);
         position: relative;
         &.state_empty {
@@ -106,35 +58,12 @@ html, body, #outer_wrap, #main_view {
                 cursor: pointer;
             }
         }
-        &.state_active {
-            
-        }
     }
     #game_space {
         height: 79%;
-        #game_studio {
-            height: 100%;
-            .slot_output {
-                width: 31%;
-                height: 31%;
-                margin: 2% 2% 0 0;
-                position: relative;
-                float: left;
-                .collect {
-                    .pro_bar_in { background-color: #79D669; }
-                    &.slot_inactive, &.slot_empty, &.slot_completed { display: none; }
-                }
-                .desk {
-                    background-size: 100% auto;
-                    background-repeat: no-repeat;
-                    position: absolute;
-                    top: 23px; left: 0; right: 0; bottom: 0;
-                    background-image: url('../img/worker/filled_desk.png');
-                    &.slot_empty { background-image: url('../img/worker/blank_desk.png'); }
-                    &.slot_completed { background-image: url('../img/worker/completed_desk.png'); }
-                    &:hover { .opacity(0.6); cursor: pointer; }
-                }
-            }
+        #game_studio { 
+            height: 100%; 
+            position: relative;
         }
         #game_history {
             height: 100%;
@@ -143,3 +72,9 @@ html, body, #outer_wrap, #main_view {
         }
     }
 }
+
+/**********************
+IMPORT FILES FOR OTHER PAGES
+***********************/
+@import "office.less";
+@import "worker.less";

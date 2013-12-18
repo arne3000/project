@@ -1,0 +1,33 @@
+<div ng-show="active" class="worker_clipboard">
+	<button class="btn back_btn" ng-click="back()">Back</button>
+	<div class="worker_headshot"></div>
+	<div class="worker_buttons">
+		<button class="btn btn-block btn-danger {{fire_state()}}" ng-click="fire_event()">Fire</button>
+		<button class="btn btn-block btn-success {{learn_state()}}" ng-click="learn_event()">Learn</button>
+		<button class="btn btn-block btn-primary {{start_state()}}" ng-click="start_event()">{{start_text}}</button>
+	</div>
+	<div class="worker_details">
+		<h1>{{data.workers[id].name}}</h1>
+		<h3>Level {{data.workers[id].level}}</h3>
+		<div class="pro_bar_out">
+			<div class="pro_bar_in" ng-style="getBarStyle(data.workers[id].progress)"></div>
+		</div>
+		<p>{{data.workers[id].name}} takes approximately {{getReadableTime(stats.collect.time)}} to complete {{stats.collect.amount}} peice of work. Their work can only be described as {{stats.relevance}} and will cost you ${{stats.collect.cost}}.</p>
+		<br/>
+		<p>{{data.workers[id].name}} is currently level {{data.workers[id].level}} and is about {{data.workers[id].progress}}% ready to level up. Teaching will cost you ${{stats.progress.cost}} to progress {{stats.progress.amount}}%.</p>
+
+		<div class="worker_stats stat_outer">
+			<div class="stat stat_innovation" ng-style="toStatStyle(stats.work.innovation)" popover="Innovation" popover-trigger="mouseenter"></div>
+			<div class="stat stat_optimisation" ng-style="toStatStyle(stats.work.optimisation)" popover="Optimisation" popover-trigger="mouseenter"></div>
+			<div class="stat stat_quality" ng-style="toStatStyle(stats.work.quality)" popover="Quality" popover-trigger="mouseenter"></div>
+		</div>
+	</div>
+</div>
+
+
+<!-- 
+<button class="btn btn-primary btn-block {{startbtnstate()}}" ng-click="startjob()">Start Job (${{getCCost}})</button>
+<button class="btn btn-success btn-block {{learnbtnstate()}}" ng-click="learn()"><i class="icon-book icon-white"></i> ${{getPCost}}</button>
+<button class="btn btn-danger btn-block {{firebtnstate()}}" ng-click="fire()"><i class="icon-fire icon-white"></i></button>
+<button class="btn btn-block">Back</button>
+ -->

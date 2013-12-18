@@ -21,10 +21,10 @@ var Helper = {
 		return Math.floor((Math.random()*max)+min);
 	},
 
-	initUserData : function() {
+	initUserData : function(companyname) {
 		var output = {
 			company : {
-				name : "new game studio",
+				name : companyname,
 				currency: 1000,
 				prem_currency: 50,
 				xp: 1,
@@ -76,16 +76,21 @@ var Helper = {
 		var seconds = date.getSeconds();
 
 		if (hours <= 0) {
-			if (minutes <= 0) {
+			if (minutes <= 0)
 				return seconds + " seconds";
-			}
-			else {
+			else
 				return minutes + " minutes and " + seconds + " seconds";
-			}
 		}
-		else {
+		else
 			return hours + " hours " + minutes + " minutes and " + seconds + " seconds";
-		}
+	},
+
+	get_vbar_style : function(value) {
+		return {top: (100-value)+"%"};
+	},
+
+	get_hbar_style : function(value) {
+		return {right: (100-value)+'%'};
 	},
 
 	formatUnixTimestamp : function(timestamp) {

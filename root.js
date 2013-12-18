@@ -56,6 +56,10 @@ myapp.config(function($stateProvider, $urlRouterProvider){
             }
         }
     })
+    .state('exit', {
+        url: "/exit",
+        templateUrl: "page/exit/template.html"
+    })
     //main game loop
     .state('main', {
         url: "/main",
@@ -71,50 +75,18 @@ myapp.config(function($stateProvider, $urlRouterProvider){
             }
         }
     })
-    //new user
-    .state('newuser', { 
-        url: "/new",
-        templateUrl: "page/newuser/template.html",
-        controller: 'Newuser_Controller',
-        resolve: {
-            libraries : function($q) {
-                var deferred = $q.defer();
-                loadLibraries(["helper", "level", "error", "metric", "slots"], function(status) {
-                    deferred.resolve(status);
-                });
-                return deferred.promise;
-            }
-        }
+    .state('main.office', {
+        templateUrl: "page/main/office/template.html",
+        controller: 'Main_Office_Controller'
     })
-    //add a game
-    .state('addgame', {
-        url: "/add",
-        templateUrl: "page/addgame/template.html",
-        controller: 'Addgame_Controller',
-        resolve: {
-            libraries : function($q) {
-                var deferred = $q.defer();
-                loadLibraries(["helper", "level", "error", "metric", "slots"], function(status) {
-                    deferred.resolve(status);
-                });
-                return deferred.promise;
-            }
-        }
+    .state('main.addgame', {
+        templateUrl: "page/main/addgame/template.html",
+        controller: 'Main_Addgame_Controller'
     })
-    //goto the worker settings
-    .state('worker', {
-        url: "/worker/:id",
-        templateUrl: "page/worker/template.html",
-        controller: 'Worker_Controller',
-        resolve: {
-            libraries : function($q) {
-                var deferred = $q.defer();
-                loadLibraries(["helper", "level", "error", "metric", "slots"], function(status) {
-                    deferred.resolve(status);
-                });
-                return deferred.promise;
-            }
-        }
+    .state('main.worker', {
+        url: "/worker/{id}",
+        templateUrl: "page/main/worker/template.html",
+        controller: 'Main_Worker_Controller'
     })
 });
 
@@ -122,33 +94,45 @@ myapp.config(function($stateProvider, $urlRouterProvider){
 /************************
     SETUP DATABASE SERVICE
 ************************/
-myapp.factory('database', function myService(angularFire, angularFireAuth) {
+myapp.factory('database', function myService($firebase, $firebaseAuth) {
     var _url = 'https://socialproject.firebaseio.com/';
-    var _ref = new Firebase(_url);
-    var verified = false;
+    var _ref = null;
+    var initialised = false;
+    var login_method = "facebook";
+    var auth = null;
+    var user = null;
+
+    var login = function() {
+        if (auth != null) {
+            auth.login(login_method);
+        }
+    };
 
     return {
-        initialise: function(_scope, localVar, localData) {
-            angularFireAuth.initialize(_ref, { 
-                scope: _scope, name: localVar,
-                callback: function(err, user) {
-                    // Called whenever there is a change in authentication state.
-                    if (user.verified == true) {
-                        verified = true;
-                        angularFire(_ref, _scope, localData);
-                    } else {
-                        verified = false;
-                        angularFireAuth.login("facebook", { rememberMe: true });
-                    }
-                    console.log(user.name+": "+err);
+        initialise: function(callback) {
+            auth = new FirebaseSimpleLogin(new Firebase(_url), function(error, _user) {
+                if (error) {
+                    // an error occurred while attempting login
+                    console.log("error");
+                    initialised = false;
+                } else if (_user) {
+                    // user authenticated with Firebase
+                    initialised = true;
+                    user = _user;
+                    callback(_user);
+                } else {
+                    // user is logged out
+                    login();
                 }
             });
         },
-        bind: function(_scope, localVar, callback) {
-            if (verified == true)
-                angularFire(_ref, _scope, localVar);
-            else
-                callback();
+
+        getData: function(fallback) {
+            if (initialised == true) {
+                return $firebase(new Firebase(_url+user.id));
+            } else {
+                fallback();
+            }
         }
     };
 });

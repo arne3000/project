@@ -1,0 +1,24 @@
+/**********************
+STYLING FOR THE OFFICE PAGE
+***********************/
+#game_studio .slot_output {
+    width: 31%;
+    height: 31%;
+    margin: 2% 2% 0 0;
+    position: relative;
+    float: left;
+    .collect {
+        .pro_bar_in { background-color: #79D669; }
+        &.slot_inactive, &.slot_empty, &.slot_completed { display: none; }
+    }
+    .desk {
+        background-size: 100% auto;
+        background-repeat: no-repeat;
+        position: absolute;
+        top: 23px; left: 0; right: 0; bottom: 0;
+        background-image: url('../img/worker/filled_desk.png');
+        &.slot_empty { background-image: url('../img/worker/blank_desk.png'); }
+        &.slot_completed { background-image: url('../img/worker/completed_desk.png'); }
+        &:hover { .opacity(0.6); cursor: pointer; }
+    }
+}
