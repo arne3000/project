@@ -12,34 +12,43 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 	*/
 
 	$scope.state = "state_notloaded";
+	$scope.completed = false;
+	$scope.user = null;
 
 	database.initialise(function(_user){
+		console.log("initialising");
+		$scope.user = _user;
+
 		$scope.data = database.getData(function(){
 			console.log('fail');
 		});
 
-		$scope.data.$on("loaded", function() {
-			if (typeof $scope.data === "undefined") {
-				$scope.state = "";
-				var modalInstance = $modal.open({
-					templateUrl: 'page/modal/newcompany/template.html',
-					controller: Modal_Newcompany_Controller,
-					backdrop: 'static',
-					keyboard: false,
-					resolve: { user: function () { return _user; } }
-				});
-				modalInstance.result.then(function(companyname) { 
-					if (companyname === "") {
-						$state.go('exit');
-					} else {
-						//set up account hereeeee
-						$scope.data.$set(Helper.initUserData(companyname));
-						console.log('done!');
-						$state.go('main.office');
-					}
-				});
-			} else {
-				$state.go('main.office');
+		$scope.data.$on("loaded", function(value) {
+			console.log(value);
+	    	if ($scope.completed == false) {
+	    		if (value == null) {
+					//must be a new user!
+					$scope.state = "";
+					$scope.completed = true;
+					var modalInstance = $modal.open({
+						templateUrl: 'page/modal/newcompany/template.html',
+						controller: Modal_Newcompany_Controller,
+						backdrop: 'static',
+						keyboard: false,
+						resolve: { user: function () { return $scope.user; } }
+					});
+					modalInstance.result.then(function(companyname) { 
+						if (companyname === "") {
+							$state.go('exit');
+						} else {
+							//set up account hereeeee
+							$scope.data.$set(Helper.initUserData(companyname));
+							$state.go('main.office');
+						}
+					});
+				} else {
+					$state.go('main.office');
+				}
 			}
 		});
 	});
@@ -116,9 +125,8 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 
 function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $stateParams, $firebase, libraries, database) {
 	$scope.data = database.getData(function() { $state.go('login'); });
-	
-	$scope.id = $stateParams.id;
 	$scope.active = false;
+	$scope.id = $stateParams.id;
 
 	$scope.back = function() {
 		$state.go("main.office");
@@ -127,10 +135,36 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
 		return Helper.readableTimestamp(time);
 	};
 
+
+	$scope.fire_state = function() {
+		if ($scope.active == true) {
+			if ($scope.data.workers.length <= 1)
+				return "disabled";
+			else
+				return "";
+		}
+	};
+    $scope.fire_event = function() {
+    	if ($scope.active == true) {
+	    	if ($scope.data.workers.length > 1) {
+				var modalInstance = $modal.open({
+					templateUrl: 'page/modal/confirmation/template.html',
+					controller: Modal_Confirmation_Controller,
+					resolve: { text: function () { return "Are you sure you want to fire?"; } }
+				});
+				modalInstance.result.then(function (confirm) { 
+					if(confirm == true) {
+						$scope.data.workers[$scope.id].$remove();
+						$state.go("main.office");
+					}
+				});
+	    	}
+	    }
+	};
+
 	$scope.initialise = function() {
-    	$scope.active = true;
-    	$scope.stats = Levels.generateData($scope.data.workers[$scope.id].level);
-    };
+		$scope.active = true;
+	};
 
 	$scope.data.$on("change", function() {
     	if (typeof $scope.data != "undefined") {

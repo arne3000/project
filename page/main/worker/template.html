@@ -7,14 +7,14 @@
 		<button class="btn btn-block btn-primary {{start_state()}}" ng-click="start_event()">{{start_text}}</button>
 	</div>
 	<div class="worker_details">
-		<h1>{{data.workers[id].name}}</h1>
-		<h3>Level {{data.workers[id].level}}</h3>
+		<h1>{{data.workers[$scope.id].name}}</h1>
+		<h3>Level {{data.workers[$scope.id].level}}</h3>
 		<div class="pro_bar_out">
 			<div class="pro_bar_in" ng-style="getBarStyle(data.workers[id].progress)"></div>
 		</div>
-		<p>{{data.workers[id].name}} takes approximately {{getReadableTime(stats.collect.time)}} to complete {{stats.collect.amount}} peice of work. Their work can only be described as {{stats.relevance}} and will cost you ${{stats.collect.cost}}.</p>
+		<p>{{data.workers[$scope.id].name}} takes approximately {{getReadableTime(stats.collect.time)}} to complete {{stats.collect.amount}} peice of work. Their work can only be described as {{stats.relevance}} and will cost you ${{stats.collect.cost}}.</p>
 		<br/>
-		<p>{{data.workers[id].name}} is currently level {{data.workers[id].level}} and is about {{data.workers[id].progress}}% ready to level up. Teaching will cost you ${{stats.progress.cost}} to progress {{stats.progress.amount}}%.</p>
+		<p>{{data.workers[$scope.id].name}} is currently level {{data.workers[$scope.id].level}} and is about {{data.workers[$scope.id].progress}}% ready to level up. Teaching will cost you ${{stats.progress.cost}} to progress {{stats.progress.amount}}%.</p>
 
 		<div class="worker_stats stat_outer">
 			<div class="stat stat_innovation" ng-style="toStatStyle(stats.work.innovation)" popover="Innovation" popover-trigger="mouseenter"></div>

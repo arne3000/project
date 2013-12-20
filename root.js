@@ -94,7 +94,7 @@ myapp.config(function($stateProvider, $urlRouterProvider){
 /************************
     SETUP DATABASE SERVICE
 ************************/
-myapp.factory('database', function myService($firebase, $firebaseAuth) {
+myapp.factory('database', function myService($firebase, $firebaseAuth, $q) {
     var _url = 'https://socialproject.firebaseio.com/';
     var _ref = null;
     var initialised = false;
@@ -111,20 +111,36 @@ myapp.factory('database', function myService($firebase, $firebaseAuth) {
     return {
         initialise: function(callback) {
             auth = new FirebaseSimpleLogin(new Firebase(_url), function(error, _user) {
+                console.log("Entering...");
                 if (error) {
-                    // an error occurred while attempting login
                     console.log("error");
+                    // an error occurred while attempting login
+                    console.log(error);
                     initialised = false;
                 } else if (_user) {
+                    console.log("all cool in da hood");
                     // user authenticated with Firebase
                     initialised = true;
                     user = _user;
                     callback(_user);
                 } else {
+                    console.log("need to log you in");
                     // user is logged out
                     login();
                 }
             });
+        },
+
+        get: function(fallback) {
+            //user.id
+            var data = $firebase(new Firebase(_url));
+            
+            var keys = data.$child(user.id).$child('company').$child('currency');
+            console.log(keys);
+            if (keys == null)
+                console.log('data not set');
+            else
+                console.log('data set');
         },
 
         getData: function(fallback) {
