@@ -1,25 +1,25 @@
-<div ng-show="active" class="worker_clipboard">
+<div class="worker_clipboard">
 	<button class="btn back_btn" ng-click="back()">Back</button>
 	<div class="worker_headshot"></div>
 	<div class="worker_buttons">
-		<button class="btn btn-block btn-danger {{fire_state()}}" ng-click="fire_event()">Fire</button>
-		<button class="btn btn-block btn-success {{learn_state()}}" ng-click="learn_event()">Learn</button>
-		<button class="btn btn-block btn-primary {{start_state()}}" ng-click="start_event()">{{start_text}}</button>
+		<button class="btn btn-block btn-danger {{firebtn().state()}}" ng-click="firebtn().click()">{{firebtn().text()}}</button>
+		<button class="btn btn-block btn-success {{learnbtn().state()}}" ng-click="learnbtn().click()">{{learnbtn().text()}}</button>
+		<button class="btn btn-block btn-primary {{jobbtn().state()}}" ng-click="jobbtn().click()">{{jobbtn().text()}}</button>
 	</div>
 	<div class="worker_details">
-		<h1>{{data.workers[$scope.id].name}}</h1>
-		<h3>Level {{data.workers[$scope.id].level}}</h3>
+		<h1>{{worker.name}}</h1>
+		<h3>Level {{worker.level}}</h3>
 		<div class="pro_bar_out">
-			<div class="pro_bar_in" ng-style="getBarStyle(data.workers[id].progress)"></div>
+			<div class="pro_bar_in" ng-style="worker.BarStyle_progress()"></div>
 		</div>
-		<p>{{data.workers[$scope.id].name}} takes approximately {{getReadableTime(stats.collect.time)}} to complete {{stats.collect.amount}} peice of work. Their work can only be described as {{stats.relevance}} and will cost you ${{stats.collect.cost}}.</p>
+		<p>{{worker.name}} takes approximately {{worker.Text_collectTime()}} to complete {{worker.stats.collect.amount}} peice of work. Their work can only be described as {{worker.stats.relevance}} and will cost you ${{worker.stats.collect.cost}}.</p>
 		<br/>
-		<p>{{data.workers[$scope.id].name}} is currently level {{data.workers[$scope.id].level}} and is about {{data.workers[$scope.id].progress}}% ready to level up. Teaching will cost you ${{stats.progress.cost}} to progress {{stats.progress.amount}}%.</p>
+		<p>{{worker.name}} is currently level {{worker.level}} and is about {{worker.progress}}% ready to level up. Teaching will cost you ${{worker.stats.progress.cost}} to progress {{worker.stats.progress.amount}}%.</p>
 
 		<div class="worker_stats stat_outer">
-			<div class="stat stat_innovation" ng-style="toStatStyle(stats.work.innovation)" popover="Innovation" popover-trigger="mouseenter"></div>
-			<div class="stat stat_optimisation" ng-style="toStatStyle(stats.work.optimisation)" popover="Optimisation" popover-trigger="mouseenter"></div>
-			<div class="stat stat_quality" ng-style="toStatStyle(stats.work.quality)" popover="Quality" popover-trigger="mouseenter"></div>
+			<div class="stat stat_innovation" ng-style="worker.BarStyle_statsI()" popover="Innovation" popover-trigger="mouseenter"></div>
+			<div class="stat stat_optimisation" ng-style="worker.BarStyle_statsO()" popover="Optimisation" popover-trigger="mouseenter"></div>
+			<div class="stat stat_quality" ng-style="worker.BarStyle_statsQ()" popover="Quality" popover-trigger="mouseenter"></div>
 		</div>
 	</div>
 </div>

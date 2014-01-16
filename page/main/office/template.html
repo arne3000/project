@@ -1,7 +1,7 @@
-<div ng-show="active" class="slot_output" ng-repeat="slot in slots.getSlots()">
-	<div class="pro_bar_out collect {{slots.getSlot_class($index)}}">
-		<div class="pro_bar_in" ng-style="slots.getBar_style($index)"></div>
-		<p>{{slots.getBar_text($index)}}</p>
+<div class="slot_output" ng-repeat="slot in slots.getSlots() track by $index">
+	<div class="pro_bar_out collect {{slots.getClass($index)}}">
+		<div class="pro_bar_in" ng-style="slot.BarStyle_time()"></div>
+		<p>{{slot.Text_time()}}</p>
 	</div>
-	<div class="desk {{slots.getSlot_class($index)}}" ng-click="slots.clickevent($index)"></div>
+	<div class="desk {{slots.getClass($index)}}" ng-click="slots.clickevent($index)"></div>
 </div>

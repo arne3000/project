@@ -13,6 +13,7 @@ jQuery.cachedScript = function( url, options ) {
 
 function loadLibraries(libsToLoad, callback) {
     var counter = 0;
+    
     for (i = 0; i < libsToLoad.length; ++i) {
         $.cachedScript( "library/"+libsToLoad[i]+"/controller.js" )
             .done(function( script, textStatus ){
@@ -21,6 +22,7 @@ function loadLibraries(libsToLoad, callback) {
                     callback(true);
             })
             .fail(function( jqxhr, settings, exception ) {
+                console.log("error: "+settings+" exception: "+exception);
                 callback("error: "+settings+" exception: "+exception);
             });
     };        
@@ -49,7 +51,7 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         resolve: {
             libraries : function($q) {
                 var deferred = $q.defer();
-                loadLibraries(["helper", "level", "error", "metric", "slots"], function(status) {
+                loadLibraries(["helper", "level", "error", "metric", "workerdata", "slots"], function(status) {
                     deferred.resolve(status);
                 });
                 return deferred.promise;
@@ -68,7 +70,7 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         resolve: {
             libraries : function($q) {
                 var deferred = $q.defer();
-                loadLibraries(["helper", "level", "error", "metric", "slots"], function(status) {
+                loadLibraries(["helper", "level", "error", "metric", "workerdata", "slots"], function(status) {
                     deferred.resolve(status);
                 });
                 return deferred.promise;
@@ -92,15 +94,18 @@ myapp.config(function($stateProvider, $urlRouterProvider){
 
 
 /************************
-    SETUP DATABASE SERVICE
+    SETUP DATABASE FACTORY
 ************************/
-myapp.factory('database', function myService($firebase, $firebaseAuth, $q) {
+myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
     var _url = 'https://socialproject.firebaseio.com/';
     var _ref = null;
     var initialised = false;
     var login_method = "facebook";
+
     var auth = null;
     var user = null;
+    var data = null;
+    var relogFunc = null;
 
     var login = function() {
         if (auth != null) {
@@ -120,9 +125,16 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $q) {
                 } else if (_user) {
                     console.log("all cool in da hood");
                     // user authenticated with Firebase
-                    initialised = true;
                     user = _user;
-                    callback(_user);
+                    data = $firebase(new Firebase(_url+user.id));
+                    data.$on("loaded", function(value) {
+                        if (value == null) {
+                            callback(false);
+                        } else {
+                            initialised = true;
+                            callback(true);
+                        }
+                    });
                 } else {
                     console.log("need to log you in");
                     // user is logged out
@@ -131,25 +143,38 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $q) {
             });
         },
 
-        get: function(fallback) {
-            //user.id
-            var data = $firebase(new Firebase(_url));
-            
-            var keys = data.$child(user.id).$child('company').$child('currency');
-            console.log(keys);
-            if (keys == null)
-                console.log('data not set');
-            else
-                console.log('data set');
+        initialSetup: function(CompanyName) {
+            initialised = true;
+            data.$set(Helper.initUserData(CompanyName));
         },
 
-        getData: function(fallback) {
-            if (initialised == true) {
-                return $firebase(new Firebase(_url+user.id));
-            } else {
-                fallback();
+        relogFunc: function() {
+            $state.go('login');
+        },
+
+        get: function() {
+            if (initialised == true)
+                return data;
+            else {
+                this.relogFunc();
+                return null;
             }
-        }
+        },
+
+        user: function() {
+            if (initialised == true)
+                return user;
+            else {
+                this.relogFunc();
+                return null;
+            }
+        },
+
+        display: function() {
+            console.log(data);
+            console.log(user);
+            console.log(auth);
+            console.log(initialised);
+        },
     };
 });
-
