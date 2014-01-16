@@ -1,31 +1,41 @@
-<div class="container {{dataState}}" id="main_view">
-	<div id="game_head" class="row">
-		<!-- <img class="pull-left" src="/htdocs/img/logo.png"/> -->
-		<h1 class="pull-left">{{userdata.company.name}}</h1>
-		<div class="pull-right tabbable tabs-below">
-			<ul class="nav nav-pills">
-        		<li class="disabled"><a href="#">${{userdata.company.currency}}</a></li>
-        		<li class="disabled"><a href="#">£{{userdata.company.prem_currency}}</a></li>
-        		<li class="disabled"><a href="#">{{userdata.company.xp}}xp</a></li>
-        		<li class="disabled"><a href="#">{{userdata.company.level}}</a></li>
-        		<li class="divider"></li>
-        		<li class="active"><a href="#">SHOP</a></li>
-        	</ul>
+<button class="btn btn-default back_btn" ng-click="back()">Back</button>
+<h1>Create a new game</h1>
+<p>some help text</p>
+<br/><br/>
+<form class="form-horizontal" role="form">
+	<div class="form-group">
+		<label class="col-sm-4 control-label">Name</label>
+		<div class="col-sm-6">
+			<input type="text" id="focusedInput" ng-model="game.name" class="form-control" placeholder="Name" size="15" required>
 		</div>
 	</div>
-	<div id="game_progress" class="row">
-		<button class="btn btn-primary" type="button">ADD GAME</button>
-	</div>
-	<div id="game_space" class="row">
-		<div id="game_studio" class="span8">
-	        <div class="slot_output" ng-repeat="slot in slots.getSlots()">
-	        	<div class="pro_bar_out collect {{slots.getSlot_class($index)}}">
-	        		<div class="pro_bar_in" ng-style="slots.getBar_style($index)"></div>
-	        		<p>{{slots.getBar_text($index)}}</p>
-	        	</div>
-	        	<div class="desk {{slots.getSlot_class($index)}}" ng-click="slots.clickevent($index)"></div>
-	        </div>
+	<div class="form-group">
+		<label class="col-sm-4 control-label">Genre</label>
+		<div class="col-sm-6">
+			<select class="form-control" ng-model="game.genre">
+				<option ng-repeat="genre in genres">{{capitalize(genre);}}</option>
+			</select>
 		</div>
-		<div id="game_history" class="span4">Previous games</div>
 	</div>
-</div>
+	<div class="form-group">
+		<label class="col-sm-4 control-label">Initial Concept</label>
+		<div class="col-sm-6">
+			<select class="form-control" ng-model="game.concept">
+				<option ng-repeat="concept in concepts">{{capitalize(concept);}}</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-4 control-label">Target Ages</label>
+		<div class="col-sm-6">
+			<select class="form-control" ng-model="game.target">
+				<option ng-repeat="ages in target_ages">{{capitalize(ages);}}</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-4 col-sm-6">
+			<button type="submit" class="btn btn-primary" ng-class="isReady()" ng-click="createGame()">Begin Games Development</button>
+		</div>
+	</div>
+</form>

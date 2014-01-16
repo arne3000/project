@@ -1,5 +1,5 @@
 <div class="worker_clipboard">
-	<button class="btn back_btn" ng-click="back()">Back</button>
+	<button class="btn btn-default back_btn" ng-click="back()">Back</button>
 	<div class="worker_headshot"></div>
 	<div class="worker_buttons">
 		<button class="btn btn-block btn-danger {{firebtn().state()}}" ng-click="firebtn().click()">{{firebtn().text()}}</button>
@@ -23,11 +23,3 @@
 		</div>
 	</div>
 </div>
-
-
-<!-- 
-<button class="btn btn-primary btn-block {{startbtnstate()}}" ng-click="startjob()">Start Job (${{getCCost}})</button>
-<button class="btn btn-success btn-block {{learnbtnstate()}}" ng-click="learn()"><i class="icon-book icon-white"></i> ${{getPCost}}</button>
-<button class="btn btn-danger btn-block {{firebtnstate()}}" ng-click="fire()"><i class="icon-fire icon-white"></i></button>
-<button class="btn btn-block">Back</button>
- -->

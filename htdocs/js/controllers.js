@@ -48,26 +48,75 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libr
 	console.log("Main_Controller");
 	$scope.data = database.get();
 
-	$scope.game_slot_state = function() {
-		if ($scope.data == null) return null;
-
-		if (typeof $scope.data.current === "undefined")
-			return "state_empty";
+	$scope.isGameSlotEmpty = function() {
+		if (typeof $scope.data.development === "undefined")
+			return true;
 		else
-			return "state_active";
-	};
-	$scope.game_slot_click = function() {
-		if ($scope.data == null) return null;
+			return false;
+	}
 
-		if (typeof $scope.data.current === "undefined")
+	$scope.addGame = function() {
+		if (typeof $scope.data.development === "undefined")
 			$state.go("main.addgame");
 	};
 };
 
 //add a new game
-function Main_Addgame_Controller($scope, libraries) {
+function Main_Addgame_Controller($scope, $state, libraries, database) {
 	console.log("Main_Addgame_Controller");
+	$scope.data = database.get();
 
+	if (typeof $scope.data.development != "undefined")
+		$state.go("main.office");
+
+	$scope.back = function() { $state.go("main.office"); };
+	$scope.capitalize = function(s) { return s[0].toUpperCase() + s.slice(1); };
+
+	$scope.genres = Helper.gameData.genres;
+	$scope.concepts = Helper.gameData.concepts;
+	$scope.target_ages = Helper.gameData.target_ages;
+
+	$scope.game = {
+		name: "",
+		genre: $scope.capitalize($scope.genres[0]),
+		concept: $scope.capitalize($scope.concepts[0]),
+		target: $scope.capitalize($scope.target_ages[0])
+	};
+
+	$scope.isReady = function() {
+		if (typeof $scope.game.name === "undefined")
+			return "disabled";
+		else {
+			if ($scope.game.name == "")
+				return "disabled";
+			else
+				return "";
+		}
+	};
+
+	$scope.createGame = function() {
+		if (typeof $scope.game.name != "undefined") {
+			if ($scope.game.name != "") {
+				$scope.game.progress = 1;
+				$scope.game.timestamp = Helper.getUnixTimestamp();
+				$scope.game.stats = {
+					innovation : 1,
+					optimisation : 1,
+					quality : 1
+				};
+				$scope.data.development = $scope.game;
+				$scope.data.$save("development");
+				$state.go("main.office");
+			}
+		}
+	}
+
+	/*name : "",
+	genre : 0, //id to a genre
+	progress : 0,
+	timestamp : 0,
+	target_age : 0,
+	controversial : 0*/
 };
 
 function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database) {
@@ -84,6 +133,10 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 			},
 			worker_completed : function(workerid) {
 				//NEED TO ADD: add to progress of current game
+				++$scope.data.development.progress;
+				if ($scope.data.development.progress) {
+					//transfer data to the games history
+				}
 				$scope.data.workers[workerid].timestamp = 0;
 				$scope.data.$save();
 				$scope.slots.setWorkers($scope.data.workers);

@@ -13,9 +13,14 @@
 			</ul>
 		</div>
 	</div>
-	<div id="game_progress" class="{{game_slot_state()}}" ng-click="game_slot_click()" class="row"></div>
+	<div id="game_progress" ng-class="{isGameSlotEmpty(): 'state_empty'}" ng-click="addGame()" class="row">
+		<div ng-hide="isGameSlotEmpty()" class="col-sm-8 padding">
+			<h3>{{data.development.name}}</h3>
+			<progressbar max="100" value="data.development.progress"></progressbar>
+		</div>
+	</div>
 	<div id="game_space" class="row">
-		<div id="game_studio" class="span8" ui-view></div>
-		<div id="game_history" class="span4">Previous games</div>
+		<div id="game_studio" class="col-md-8" ui-view></div>
+		<div id="game_history" class="col-md-4">Previous games</div>
 	</div>
 </div>

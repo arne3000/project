@@ -15,7 +15,12 @@ var Helper = {
 			case Helper.btnState.inactive: return "state_inactive";
 		}
 	},
-	
+
+	gameData : {
+		genres : ["adventure", "stratergy", "arcade", "clicking", "shooter", "educational", "simulation"],
+		concepts : ["tetris", "age of empires", "chess"],
+		target_ages : ["0 to 10", "10 to 20", "20 to 30", "30 to 5000"]
+	},
 
 	randNum : function(min, max) {
 		return Math.floor((Math.random()*max)+min);
@@ -32,9 +37,9 @@ var Helper = {
 			},
 			workers : [Helper.createWorker(4, Helper.randName(), 1)],
 			games : {
-				current : {},
-				past : {}
-			}
+				//list of past games should it need a intial game to tick over funding?
+			},
+			development : {}
 		};
 
 		return output;
