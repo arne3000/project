@@ -13,7 +13,7 @@
 			</ul>
 		</div>
 	</div>
-	<div id="game_progress" ng-class="{isGameSlotEmpty(): 'state_empty'}" ng-click="addGame()" class="row">
+	<div id="game_progress" ng-class="gameSlotClass()" ng-click="addGame()" class="row">
 		<div ng-hide="isGameSlotEmpty()" class="col-sm-8 padding">
 			<h3>{{data.development.name}}</h3>
 			<progressbar max="100" value="data.development.progress"></progressbar>
@@ -21,6 +21,21 @@
 	</div>
 	<div id="game_space" class="row">
 		<div id="game_studio" class="col-md-8" ui-view></div>
-		<div id="game_history" class="col-md-4">Previous games</div>
+		<div id="game_history" class="col-md-4">
+			<div class="panel panel-default" ng-repeat="game in data.launched track by $index">
+				<div class="panel-heading"><h3 class="panel-title">{{game.name}}</h3></div>
+				<div class="panel-body">
+					<ul>
+						<li>{{game.popularity}}</li>
+						<li>${{game.ppu * game.popularity}}</li>
+					</ul>
+					<div class="display_pop">
+						<div class="pop_stat" ng-repeat="data in gameData[$index].data">
+							<div class="pop_bar" ng-style="{top: (100-data.percentage)+'%'}"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

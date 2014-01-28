@@ -9,6 +9,7 @@ var WorkerData = {
 	},
 
 	construct : function(_id, data) {
+		console.log(data);
 		var output = {
 			workerid : _id,
 			state : WorkerData.states.inactive,

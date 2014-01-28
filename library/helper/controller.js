@@ -74,6 +74,16 @@ var Helper = {
 		return Math.round(milliseconds/1000);
 	},
 
+	getPercentage : function(val, max) {
+		var percent = max / 100;
+		return (percent * val);
+	},
+
+	createPercentage : function(val, max) {
+		var percent = 100 / max;
+		return (percent * val);
+	},
+
 	readableTimestamp : function(timestamp) {
 		var date = new Date(timestamp * 1000);
 		var hours = date.getHours();

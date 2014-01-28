@@ -21,7 +21,6 @@ function slots(init_data, _events) {
 			for (i = 0; i < workerArray.length; ++i) {
 				if (typeof workerArray[i] != "undefined") {
 					this.data[workerArray[i].slotid] = WorkerData.construct(i, workerArray[i]);
-					//console.log(this.data[workerArray[i].slotid].data());
 				}
 			}
 		}
