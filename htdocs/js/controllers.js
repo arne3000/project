@@ -6,26 +6,30 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 	$scope.completed = false;
 
 	$scope.login_btn_fb = function() {
-		if ($scope.btnsState != "disabled")
+		if ($scope.btnsState != "disabled") {
+			$scope.loading = true;
+			$scope.btnsState = "disabled";
 			database.login('facebook');
+		}
 	};
 	$scope.login_btn_anon = function() {
-		if ($scope.btnsState != "disabled")
+		if ($scope.btnsState != "disabled") {
 			database.login('anonymous');
+			$scope.loading = true;
+			$scope.btnsState = "disabled";
+		}
 	};
 
 	$scope.loading = true;
 	$scope.btnsState = "disabled";
 
 	database.initialise(function(result) {
-		console.log(result);
 		switch (result) {
 			case 0: 
 				$scope.loading = true;
 				$state.go('main.office');
 				break;
 			case 1:
-				$scope.btnsState = "disabled";
 				if ($scope.completed == false) {
 					//must be a new user!
 					$scope.completed = true;
@@ -36,6 +40,7 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 						keyboard: false
 					}).result.then(function(companyname) { 
 						if (companyname === "") {
+							database.logout();
 							$state.go('exit');
 						} else {
 							//set up account hereeeee
@@ -55,35 +60,16 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 };
 
 //main game loop
-function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database) {
+function Main_Controller($scope, $state, $timeout, filterFilter, $modal, $log, $firebase, libraries, database) {
 	console.log("Main_Controller");
 	$scope.data = database.get();
 
+	$scope.activeGameState = Helper.gameState.active;
 
-	$scope.isGameSlotEmpty = function() {
-		if (typeof $scope.data.development === "undefined")
-			return true;
-		else
-			return false;
-	};
-	$scope.gameSlotClass = function() {
-		if (typeof $scope.data.development === "undefined")
-			return "state_empty";
-		else
-			return "state_active";
-	};
-
-	$scope.addGame = function() {
-		if (typeof $scope.data.development === "undefined")
-			$state.go("main.addgame");
-	};
-
-	$scope.onTimeout = function() {
-		
-        mytimeout = $timeout($scope.onTimeout,6000);
-    };
-
-	var mytimeout = $timeout($scope.onTimeout,6000);
+	$scope.logout = function() {
+		database.logout();
+		$state.go('login');
+	}
 };
 
 //add a new game
@@ -91,7 +77,7 @@ function Main_Addgame_Controller($scope, $state, libraries, database) {
 	console.log("Main_Addgame_Controller");
 	$scope.data = database.get();
 
-	if (typeof $scope.data.development != "undefined")
+	if (database.gamesInDev() > 0)
 		$state.go("main.office");
 
 	$scope.back = function() { $state.go("main.office"); };
@@ -122,11 +108,11 @@ function Main_Addgame_Controller($scope, $state, libraries, database) {
 	$scope.createGame = function() {
 		if (typeof $scope.game.name != "undefined") {
 			if ($scope.game.name != "") {
-				database.addDevelopment(game.name, game.genre, game.concept, game.target);
+				database.createGame($scope.game.name, $scope.game.genre, $scope.game.concept, $scope.game.target);
 				$state.go("main.office");
 			}
 		}
-	}
+	};
 };
 
 function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database) {
@@ -135,6 +121,43 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 	$scope.data.$on("change", function() {
 		$scope.slots.setWorkers($scope.data.workers);
 	});
+
+	$scope.gameSlotActive = function() {
+		if (database.gamesInDev() <= 0)
+			return false;
+		else
+			return true;
+	};
+	$scope.gameSlotLaunchReady = function() {
+		var id = database.getGameInDev();
+		if (id != null) {
+			if ($scope.data.games[id].state == Helper.gameState.launchReady)
+				return true;
+			else
+				return false
+		}
+	};
+	$scope.gameSlotData = function() {
+		var id = database.getGameInDev();
+		if (id != null)
+			return $scope.data.games[id];
+		else
+			return null;
+	};
+	$scope.addGame = function() {
+		if (database.gamesInDev() <= 0)
+			$state.go("main.addgame");
+	};
+
+	$scope.LaunchGame = function() {
+		var id = database.getGameInDev();
+		if (id != null) {
+			if ($scope.data.games[id].state == Helper.gameState.launchReady)
+				database.launchGame();
+		}
+	};
+
+
 
     $scope.slots = new slots(
     	$scope.data.workers, {
@@ -232,7 +255,7 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
 	$scope.jobbtn = function() {
     	return {
     		text : function() {
-    			if (typeof $scope.data.development == "undefined")
+    			if (database.gamesInDev() <= 0)
     				return "No Development";
     			else {
     				if ($scope.worker.state == WorkerData.states.inactive)
@@ -246,7 +269,7 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
 				}
     		},
     		state : function() {
-    			if ($scope.data.company.currency < $scope.worker.stats.collect.cost || $scope.worker.state == WorkerData.states.busy || typeof $scope.data.development == "undefined")
+    			if ($scope.data.company.currency < $scope.worker.stats.collect.cost || $scope.worker.state == WorkerData.states.busy || database.gamesInDev() <= 0)
 					return "disabled";
 				else
 					return "";

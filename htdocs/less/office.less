@@ -1,24 +1,51 @@
 /**********************
 STYLING FOR THE OFFICE PAGE
 ***********************/
-#game_studio .slot_output {
-    width: 31%;
-    height: 31%;
-    margin: 2% 2% 0 0;
-    position: relative;
-    float: left;
-    .collect {
-        .pro_bar_in { background-color: #79D669; }
-        &.slot_inactive, &.slot_empty, &.slot_completed { display: none; }
+#game_studio {
+    #gamedev_space {
+        position: relative;
+        
+        .state_empty {
+            height: 150px;
+            background-color: #F1F1F1;
+            border-style: dashed;
+            border-width: 5px;
+            border-color: #C7C7C7;
+            &:after {
+                content: "Click to Add Game";
+                text-align: center;
+                position: absolute;
+                top: 50%; bottom: 50%; left: 0; right: 0;
+                line-height: 0;
+                font-size: 30px;
+                color: #999;
+                display: block;
+            }
+            &:hover {
+                background-color: #FCFCFC;
+                cursor: pointer;
+            }
+        }
     }
-    .desk {
-        background-size: 100% auto;
-        background-repeat: no-repeat;
-        position: absolute;
-        top: 23px; left: 0; right: 0; bottom: 0;
-        background-image: url('../img/worker/filled_desk.png');
-        &.slot_empty { background-image: url('../img/worker/blank_desk.png'); }
-        &.slot_completed { background-image: url('../img/worker/completed_desk.png'); }
-        &:hover { .opacity(0.6); cursor: pointer; }
+    #studio_space {
+        height: 80%;   
+    }
+    .slot_output {
+        width: 31%;
+        height: 31%;
+        margin: 2% 2% 0 0;
+        position: relative;
+        float: left;
+        .bar-time.slot_inactive, .bar-time.slot_empty, .bar-time.slot_completed { display: none; }
+        .desk {
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 23px; left: 0; right: 0; bottom: 0;
+            background-image: url('../img/worker/filled_desk.png');
+            &.slot_empty { background-image: url('../img/worker/blank_desk.png'); }
+            &.slot_completed { background-image: url('../img/worker/completed_desk.png'); }
+            &:hover { .opacity(0.6); cursor: pointer; }
+        }
     }
 }

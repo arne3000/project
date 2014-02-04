@@ -8,7 +8,7 @@ var Levels = {
 			amount : 1,
 			cost : { min: 5, max: 1000 },
 			prem : { min: 1, max: 30 },
-			time : { min: 30, max: 3600 }
+			time : { min: 10, max: 600 }
 		},
 		progress : { 
 			amount : 10,
@@ -71,7 +71,7 @@ var Levels = {
 		return Levels.calculate(level, Levels.data.collect.prem);
 	},
 	toCollectTime : function(level) {
-		return Levels.calculate(level, Levels.data.collect.time);
+		return Levels.data.collect.time.max - Levels.calculate(level, Levels.data.collect.time);
 	},
 
 	toProgressAmount : function() {

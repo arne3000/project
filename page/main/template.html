@@ -1,38 +1,51 @@
 <div class="container" id="main_view">
-	<div id="game_head" class="row">
-		<!-- <img class="pull-left" src="/htdocs/img/logo.png"/> -->
-		<h1 class="pull-left">{{data.company.name}}</h1>
-		<div class="pull-right tabbable tabs-below">
-			<ul class="nav nav-pills">
-				<li class="disabled"><a href="#">${{data.company.currency}}</a></li>
-				<li class="disabled"><a href="#">£{{data.company.prem_currency}}</a></li>
-				<li class="disabled"><a href="#">{{data.company.xp}}xp</a></li>
-				<li class="disabled"><a href="#">{{data.company.level}}</a></li>
-				<li class="divider"></li>
-				<li class="active"><a href="#">SHOP</a></li>
-			</ul>
+	<div class="row">
+		<div class="col-md-2">
+			<a class="navbar-brand logoimage small" ui-sref="main">
+				<img src="htdocs/img/logo.png" class="img-responsive" alt="Social Game Tycoon">
+			</a>
 		</div>
-	</div>
-	<div id="game_progress" ng-class="gameSlotClass()" ng-click="addGame()" class="row">
-		<div ng-hide="isGameSlotEmpty()" class="col-sm-8 padding">
-			<h3>{{data.development.name}}</h3>
-			<progressbar max="100" value="data.development.progress"></progressbar>
+		<div class="col-md-7">
+			<ul id="mainNav" class="nav nav-pills nav-justified">
+				<li class="active"><a ui-sref="main.office">Home</a></li>
+				<li><a ui-sref="help">Help</a></li>
+				<li><a ui-sref="about">About</a></li>
+				<li><a ui-sref="shop">Get More £</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a>Terms and Conditions</a></li>
+						<li><a>Remove Account</a></li>
+						<li class="divider"></li>
+						<li><a ng-click="logout()">Logout</a></li>
+					</ul>
+				</li>
+			</ul>
 		</div>
 	</div>
 	<div id="game_space" class="row">
 		<div id="game_studio" class="col-md-8" ui-view></div>
 		<div id="game_history" class="col-md-4">
-			<div class="panel panel-default" ng-repeat="game in data.launched track by $index">
-				<div class="panel-heading"><h3 class="panel-title">{{game.name}}</h3></div>
-				<div class="panel-body">
-					<ul>
-						<li>{{game.popularity}}</li>
-						<li>${{game.ppu * game.popularity}}</li>
+			<div class="panel panel-default" >
+				<div class="panel-heading">
+					<h2>{{data.company.name}}</h2>
+					<div class="bar bar-sm bar-level bar-wrapped">
+						<p class="text-left">{{data.company.level}}</p>
+						<p class="text-right">{{data.company.level+1}}</p>
+						<div class="bar-inner" ng-style="{right: 100-data.company.xp+'%'}"></div>
+					</div>
+					<ul class="list-inline">
+						<li><span class="glyphicon glyphicon-usd"></span> {{data.company.currency}}</li>
+						<li><span class="glyphicon glyphicon-gbp"></span> {{data.company.prem_currency}}</li>
 					</ul>
-					<div class="display_pop">
-						<div class="pop_stat" ng-repeat="data in gameData[$index].data">
-							<div class="pop_bar" ng-style="{top: (100-data.percentage)+'%'}"></div>
-						</div>
+				</div>
+				<div class="panel-body">
+					<div class="well well-sm" ng-repeat="game in data.games | filter:{ state: activeGameState }">
+						<ul class="list-unstyled">
+							<li>{{game.name}}</li>
+							<li>{{game.state}}</li>
+							<li>{{game.popularity}}</li>
+						</ul>
 					</div>
 				</div>
 			</div>

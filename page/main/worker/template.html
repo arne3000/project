@@ -8,10 +8,12 @@
 	</div>
 	<div class="worker_details">
 		<h1>{{worker.name}}</h1>
-		<h3>Level {{worker.level}}</h3>
-		<div class="pro_bar_out">
-			<div class="pro_bar_in" ng-style="worker.BarStyle_progress()"></div>
+		<div class="bar bar-sm bar-level bar-wrapped">
+			<p class="text-left">{{worker.level}}</p>
+			<p class="text-right">{{worker.level+1}}</p>
+			<div class="bar-inner" ng-style="worker.BarStyle_progress()"></div>
 		</div>
+		<br/>
 		<p>{{worker.name}} takes approximately {{worker.Text_collectTime()}} to complete {{worker.stats.collect.amount}} peice of work. Their work can only be described as {{worker.stats.relevance}} and will cost you ${{worker.stats.collect.cost}}.</p>
 		<br/>
 		<p>{{worker.name}} is currently level {{worker.level}} and is about {{worker.progress}}% ready to level up. Teaching will cost you ${{worker.stats.progress.cost}} to progress {{worker.stats.progress.amount}}%.</p>

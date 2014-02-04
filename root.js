@@ -93,6 +93,9 @@ myapp.config(function($stateProvider, $urlRouterProvider){
 });
 
 
+
+
+
 /************************
     SETUP DATABASE FACTORY
 ************************/
@@ -134,6 +137,11 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
 
         login: function(method) {
             auth.login(method);
+        },
+
+        logout: function() {
+            initialised = false;
+            auth.logout();
         },
 
         initialSetup: function(CompanyName) {
@@ -206,18 +214,43 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
         removeWorker: function(slotid) {
             data.$child("workers").$remove(slotid);
         },
-        workerCompleted: function(id) {
-            ++data.development.progress;
-            data.development.stats.innovation += Levels.toWorkInnovation(data.workers[id].level);
-            data.development.stats.optimisation += Levels.toWorkOptimisation(data.workers[id].level);
-            data.development.stats.quality += Levels.toWorkQuality(data.workers[id].level);
-            
-            if (data.development.progress >= 100) {
-                //transfer data to the games history
-                this.launchGame();
+        gamesInDev: function() {
+            if (typeof data.games === "undefined")
+                return 0;
+
+            var noGames = 0;
+            for (i = 0; i < data.games.length; ++i) {
+                if (data.games[i].state == Helper.gameState.development || data.games[i].state == Helper.gameState.launchReady)
+                    ++noGames;
             }
-            data.workers[id].timestamp = 0;
-            data.$save();
+            return noGames;
+        },
+        getGameInDev: function() {
+            if (typeof data.games === "undefined")
+                return null;
+
+            for (i = 0; i < data.games.length; ++i) {
+                if (data.games[i].state == Helper.gameState.development || data.games[i].state == Helper.gameState.launchReady)
+                    return i;
+            }
+        },
+        workerCompleted: function(id) {
+            if (this.gamesInDev() > 0) {
+                var gameID = this.getGameInDev();
+
+                if (data.games[gameID].state == Helper.gameState.development) {
+                    ++data.games[gameID].devProgress;
+                    data.games[gameID].stats.innovation += Levels.toWorkInnovation(data.workers[id].level);
+                    data.games[gameID].stats.optimisation += Levels.toWorkOptimisation(data.workers[id].level);
+                    data.games[gameID].stats.quality += Levels.toWorkQuality(data.workers[id].level);
+                    
+                    if (data.games[gameID].devProgress >= 100) {
+                        data.games[gameID].state = Helper.gameState.launchReady;
+                    }
+                    data.workers[id].timestamp = 0;
+                    data.$save();
+                }
+            }
         },
         workerUpgrade: function(id, amount, cost) {
             if (data.company.currency >= cost && Levels.isValid(data.workers[id].level) == true) {
@@ -232,60 +265,34 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
             }
         },
         workerStartJob: function(id, cost) {
-            if (data.company.currency >= cost && data.workers[id].timestamp <= 0 && typeof data.development != "undefined") {
+            if (data.company.currency >= cost && data.workers[id].timestamp <= 0 && this.gamesInDev() > 0) {
                 data.company.currency -= cost;
                 data.workers[id].timestamp = Helper.getUnixTimestamp();
                 data.$save();
             }
         },
-        createDevelopment: function(_name, _genre, _concept, _target) {
-            data.development = {
-                name : _name,
-                genre : _genre,
-                concept : _concept,
-                target : _target,
-                progress : 1,
-                timestamp : Helper.getUnixTimestamp(),
-                stats : {
-                    innovation : 1,
-                    optimisation : 1,
-                    quality : 1
-                }
-            };
-            data.$save("development");
+
+        createGame: function(_name, _genre, _concept, _target) {
+            if (typeof data.games == "undefined")
+                data.games = new Array();
+
+            if (this.gamesInDev() <= 0) {
+                data.games.push(Helper.initGameData(_name, _genre, _concept, _target));
+                data.$save("games");
+            }
         },
         launchGame: function() {
-            if (typeof data.development != "undefined") {
-                if (data.development.progress >= 100) {
-                    //need to figure out how these will be calculated
-                    var _peak = 1000000;
-                    var _rate = 50;
-                    var _ppu = 0.2;
-
-                    data.launched.push({
-                        active: true,
-                        //data from game dev, saved for visual display
-                        name : data.development.name,
-                        genre : data.development.genre,
-                        concept : data.development.concept,
-                        target : data.development.target,
-                        stats : {
-                            innovation : data.development.stats.innovation,
-                            optimisation : data.development.stats.optimisation,
-                            quality : data.development.stats.quality
-                        },
-                        created : Helper.getUnixTimestamp(),
-                        timestamp : Helper.getUnixTimestamp(), //calculated on game launch
-                        popularity : 1000, 
-                        peak : _peak,
-                        initrate : _rate,
-                        rate : _rate,
-                        ppu : _ppu
-                    });
-                    delete data.development;
-                    data.$save();
+            for (i = 0; i < data.games.length; ++i) {
+                if (data.games[i].state == Helper.gameState.launchReady) {
+                    data.games[i].state = Helper.gameState.active;
+                    data.games[i].timeLaunched = Helper.getUnixTimestamp();
+                    data.games[i].popularity = 1000;
+                    data.games[i].peak = 100000;
+                    data.games[i].ppu = 0.1;
+                    data.games[i].rate = 10;
                 }
             }
+            data.$save("games");
         }
     };
 });

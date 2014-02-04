@@ -1,7 +1,31 @@
-<div class="slot_output" ng-repeat="slot in slots.getSlots() track by $index">
-	<div class="pro_bar_out collect {{slots.getClass($index)}}">
-		<div class="pro_bar_in" ng-style="slot.BarStyle_time()"></div>
-		<p>{{slot.Text_time()}}</p>
+<div id="gamedev_space" class="row panel panel-default">
+	<div ng-hide="gameSlotActive()" class="panel-body state_empty" ng-click="addGame()"></div>
+	<div ng-show="gameSlotActive()" class="panel-body">
+		<div class="col-md-2">
+			<img src="htdocs/img/game_icon.png" class="img-responsive" alt="Game Icon">
+		</div>
+		<div class="col-md-10">
+			<h4>{{gameSlotData().name}}</h4>
+			<ul class="list-inline">
+				<li><h5>Genre <small>{{gameSlotData().genre}}</small></h5></li>
+				<li><h5>Target Audience <small>{{gameSlotData().target}}</small></h5></li>
+				<li><h5>Copy Of <small>{{gameSlotData().concept}}</small></h5></li>
+			</ul>
+			<div class="bar bar-lg bar-dev_progress">
+				<div class="bar-inner" ng-style="{right: 100-gameSlotData().devProgress+'%'}"></div>
+			</div>
+		</div>
 	</div>
-	<div class="desk {{slots.getClass($index)}}" ng-click="slots.clickevent($index)"></div>
+	<div ng-show="gameSlotActive()" class="panel-footer">
+		<button type="button" class="btn btn-primary btn-sm btn-block {{gameSlotLaunchReady() && 'ready' || 'disabled'}}" ng-click="LaunchGame()">Launch Game</button>
+	</div>
+</div>
+<div id="studio_space" class="row">
+	<div class="slot_output" ng-repeat="slot in slots.getSlots() track by $index">
+		<div class="bar bar-lg bar-time {{slots.getClass($index)}}">
+			<div class="bar-inner" ng-style="slot.BarStyle_time()"></div>
+			<p class="text-center">{{slot.Text_time()}}</p>
+		</div>
+		<div class="desk {{slots.getClass($index)}}" ng-click="slots.clickevent($index)"></div>
+	</div>
 </div>

@@ -8,6 +8,13 @@ var Helper = {
 		inactive: 2
 	},
 
+	gameState : {
+		development: 0,
+		launchReady: 1,
+		active: 2,
+		inactive: 3
+	},
+
 	btnClass : function (state) {
 		switch (state) {
 			case Helper.btnState.active: return "state_active";
@@ -26,6 +33,30 @@ var Helper = {
 		return Math.floor((Math.random()*max)+min);
 	},
 
+	initGameData : function(_name, _genre, _concept, _target) {
+		var output = {
+			state: Helper.gameState.development,
+	        name : _name,
+	        genre : _genre,
+	        concept : _concept,
+	        target : _target,
+	        stats : {
+	            innovation : 1,
+	            optimisation : 1,
+	            quality : 1
+	        },
+	        timeCreated : Helper.getUnixTimestamp(),
+	        timeLaunched : 0,
+	        timeLastCollected: 0,
+	        devProgress : 1,
+	        popularity : 1, 
+	        peak : 0,
+	        rate : 0,
+	        ppu : 0
+	    };
+	    return output;
+    },
+
 	initUserData : function(companyname) {
 		var output = {
 			company : {
@@ -36,10 +67,6 @@ var Helper = {
 				level: 1
 			},
 			workers : [Helper.createWorker(4, Helper.randName(), 1)],
-			games : {
-				//list of past games should it need a intial game to tick over funding?
-			},
-			development : {}
 		};
 
 		return output;
