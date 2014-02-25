@@ -1,0 +1,22 @@
+<div class="modal-header">
+	<h3>Profits Report</h3>
+</div>
+<div class="modal-body">
+	<table class="table table-condensed">
+		<tr>
+			<th>Game</th>
+			<th>Popularity</th>
+			<th>Change</th>
+			<th>Profit</th>
+		</tr>
+		<tr ng-repeat="game in data">
+			<td>{{game.name}}</td>
+			<td>{{game.prev_pop}}</td>
+			<td><span class="glyphicon {{getClass(game.new_pop - game.prev_pop)}}">{{game.new_pop - game.prev_pop}}</span></td>
+			<td>{{game.currency}}</td>
+		</tr>
+	</table>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary btn-block" ng-click="close()">Close</button>
+</div>

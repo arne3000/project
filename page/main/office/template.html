@@ -11,7 +11,7 @@
 				<li><h5>Target Audience <small>{{gameSlotData().target}}</small></h5></li>
 				<li><h5>Copy Of <small>{{gameSlotData().concept}}</small></h5></li>
 			</ul>
-			<div class="bar bar-lg bar-dev_progress">
+			<div class="bar bar-sm bar-dev_progress">
 				<div class="bar-inner" ng-style="{right: 100-gameSlotData().devProgress+'%'}"></div>
 			</div>
 		</div>
@@ -22,7 +22,7 @@
 </div>
 <div id="studio_space" class="row">
 	<div class="slot_output" ng-repeat="slot in slots.getSlots() track by $index">
-		<div class="bar bar-lg bar-time {{slots.getClass($index)}}">
+		<div class="bar bar-sm bar-time {{slots.getClass($index)}}">
 			<div class="bar-inner" ng-style="slot.BarStyle_time()"></div>
 			<p class="text-center">{{slot.Text_time()}}</p>
 		</div>

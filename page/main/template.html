@@ -10,7 +10,7 @@
 				<li class="active"><a ui-sref="main.office">Home</a></li>
 				<li><a ui-sref="help">Help</a></li>
 				<li><a ui-sref="about">About</a></li>
-				<li><a ui-sref="shop">Get More £</a></li>
+				<li><a ui-sref="shop">Shop</a></li>
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
 					<ul class="dropdown-menu">
@@ -37,15 +37,19 @@
 					<ul class="list-inline">
 						<li><span class="glyphicon glyphicon-usd"></span> {{data.company.currency}}</li>
 						<li><span class="glyphicon glyphicon-gbp"></span> {{data.company.prem_currency}}</li>
+						<li><span class="glyphicon glyphicon-time"></span> {{years}} years {{months}} months  </li>
 					</ul>
 				</div>
 				<div class="panel-body">
-					<div class="well well-sm" ng-repeat="game in data.games | filter:{ state: activeGameState }">
-						<ul class="list-unstyled">
-							<li>{{game.name}}</li>
-							<li>{{game.state}}</li>
-							<li>{{game.popularity}}</li>
-						</ul>
+					<div ng-show="activegames()" class="alert alert-info game_display" ng-repeat="game in data.games | filter:{ state: activeGameState }">
+						<strong>{{game.name}}</strong>
+						<button type="button" class="btn btn-game btn-xs pull-right"><span class="glyphicon glyphicon-cog"></span></button>
+
+						<p class="pull-right">{{game.popularity}}</p>
+					</div>
+					<div ng-hide="activegames()" class="alert alert-danger">
+						<strong>No Games Published</strong>
+						<p>Create a game and once fully developed it will start earning you money</p>
 					</div>
 				</div>
 			</div>

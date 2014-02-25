@@ -64,9 +64,29 @@ var Helper = {
 				currency: 1000,
 				prem_currency: 50,
 				xp: 1,
-				level: 1
+				level: 1,
+				timestamp: 0,
+				created: Helper.getUnixTimestamp()
 			},
 			workers : [Helper.createWorker(4, Helper.randName(), 1)],
+		};
+
+		return output;
+	},
+
+	DefaultData : function() {
+		var output = {
+			company : {
+				name : "",
+				currency: 0,
+				prem_currency: 0,
+				xp: 1,
+				level: 1,
+				timestamp: 0,
+				created: 0
+			},
+			workers : new Array(),
+			games: new Array(),
 		};
 
 		return output;
@@ -133,6 +153,29 @@ var Helper = {
 
 	get_hbar_style : function(value) {
 		return {right: (100-value)+'%'};
+	},
+
+	inGameYear : 4000, //86400
+
+	calculateGameYears: function(timestamp) {
+		var diff = Helper.getUnixTimestamp() - timestamp;
+		var multiple = diff / Helper.inGameYear;
+		return Math.floor(multiple);
+	},
+
+	calculateGameMonths: function(timestamp) {
+		var diff = Helper.getUnixTimestamp() - timestamp;
+		var multiple = diff / Helper.inGameYear;
+		var year = Math.floor(multiple);
+		return Math.floor((multiple - year) * 12);
+	},
+
+	calculateGameTimestamp: function(timestamp) {
+		var diff = Helper.getUnixTimestamp() - timestamp;
+		var years = Helper.calculateGameYears(timestamp);
+		var years_stamp = years * Helper.inGameYear;
+		var remaining = diff - years_stamp;
+		return Helper.getUnixTimestamp() - remaining;
 	},
 
 	formatUnixTimestamp : function(timestamp) {

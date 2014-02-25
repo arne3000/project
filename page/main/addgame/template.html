@@ -1,6 +1,9 @@
 <button class="btn btn-default back_btn" ng-click="back()">Back</button>
 <h1>Create a new game</h1>
-<p>some help text</p>
+<p>
+	Enter the details for your new game, different settings will determine the success of your game. <br/>
+	Some settings requires your company to be of a certain level and extra funds.
+</p>
 <br/><br/>
 <form class="form-horizontal" role="form">
 	<div class="form-group">
@@ -13,7 +16,7 @@
 		<label class="col-sm-4 control-label">Genre</label>
 		<div class="col-sm-6">
 			<select class="form-control" ng-model="game.genre">
-				<option ng-repeat="genre in genres" value="$index">{{capitalize(genre);}}</option>
+				<option ng-repeat="genre in genres" value="{{$index}}">{{capitalize(genre);}}</option>
 			</select>
 		</div>
 	</div>
@@ -21,7 +24,7 @@
 		<label class="col-sm-4 control-label">Initial Concept</label>
 		<div class="col-sm-6">
 			<select class="form-control" ng-model="game.concept">
-				<option ng-repeat="concept in concepts" value="$index">{{capitalize(concept);}}</option>
+				<option ng-repeat="concept in concepts" value="{{$index}}">{{capitalize(concept);}}</option>
 			</select>
 		</div>
 	</div>
@@ -29,7 +32,7 @@
 		<label class="col-sm-4 control-label">Target Ages</label>
 		<div class="col-sm-6">
 			<select class="form-control" ng-model="game.target">
-				<option ng-repeat="ages in target_ages" value="$index">{{capitalize(ages);}}</option>
+				<option ng-repeat="ages in target_ages" value="{{$index}}">{{capitalize(ages);}}</option>
 			</select>
 		</div>
 	</div>

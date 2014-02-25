@@ -105,7 +105,7 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
     var initialised = false;
 
     var auth = null;
-    var data = null;
+    var data = Helper.DefaultData();
     var relogFunc = null;
 
 
@@ -225,6 +225,17 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
             }
             return noGames;
         },
+        gamesActive: function() {
+            if (typeof data.games === "undefined")
+                return 0;
+
+            var noGames = 0;
+            for (i = 0; i < data.games.length; ++i) {
+                if (data.games[i].state == Helper.gameState.active)
+                    ++noGames;
+            }
+            return noGames;
+        },
         getGameInDev: function() {
             if (typeof data.games === "undefined")
                 return null;
@@ -289,10 +300,38 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
                     data.games[i].popularity = 1000;
                     data.games[i].peak = 100000;
                     data.games[i].ppu = 0.1;
-                    data.games[i].rate = 10;
+                    data.games[i].rate = 2;
                 }
             }
             data.$save("games");
+        },
+        profitCollect: function() {
+            var output = new Array();
+
+            for (i = 0; i < data.games.length; ++i) {
+                if (data.games[i].state == Helper.gameState.active) {
+                    if (data.games[i].popularity*data.games[i].rate > data.games[i].peak && data.games[i].rate > 0) {
+                        data.games[i].rate = -data.games[i].rate;
+                    }
+                    var prev_pop = data.games[i].popularity;
+                    data.games[i].popularity *= data.games[i].rate;
+
+                    var currency_increase = (data.games[i].popularity * data.games[i].ppu);
+                    data.company.currency += currency_increase;
+
+                    output.push({
+                        name: data.games[i].name,
+                        prev_pop: prev_pop,
+                        new_pop: data.games[i].popularity,
+                        currency: currency_increase
+                    });
+                }
+            }
+            data.company.timestamp = Helper.calculateGameTimestamp(data.company.timestamp);
+
+            data.$save();
+
+            return output;
         }
     };
 });

@@ -60,16 +60,57 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 };
 
 //main game loop
-function Main_Controller($scope, $state, $timeout, filterFilter, $modal, $log, $firebase, libraries, database) {
+function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database) {
 	console.log("Main_Controller");
 	$scope.data = database.get();
 
+	$scope.years = 0;
+	$scope.months = 0;
 	$scope.activeGameState = Helper.gameState.active;
+	$scope.ingameyear = Helper.inGamerYear;
+
+	$scope.activegames = function() {
+		if (database.gamesActive() > 0)
+			return true;
+		else
+			return false;
+	};
+	$scope.GetCompanyDate = function() {
+		if (typeof $scope.data.company != "undefined") {
+			$scope.years = Helper.calculateGameYears($scope.data.company.created);
+			$scope.months = Helper.calculateGameMonths($scope.data.company.created);
+		}
+	};
+
+	$scope.CheckTriggers = function() {
+		if ($scope.activegames()) {
+			var time = $scope.data.company.timestamp;
+			if (time <= 0)
+				time = $scope.data.company.created;
+
+			if (Helper.calculateGameYears(time) >= 1) {
+				var displaydata = database.profitCollect();
+				$modal.open({
+					templateUrl: 'page/modal/profit/template.html',
+					controller: Modal_Profit_Controller,
+					resolve: { data: function() { return displaydata; }	}
+				});
+			}
+		}
+	};
 
 	$scope.logout = function() {
 		database.logout();
 		$state.go('login');
-	}
+	};
+
+	$scope.onTimeout = function(){
+		$scope.GetCompanyDate();
+    	$scope.CheckTriggers();
+        mytimeout = $timeout($scope.onTimeout,10000);
+    };
+
+	var mytimeout = $timeout($scope.onTimeout,10000);
 };
 
 //add a new game
@@ -139,8 +180,14 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 	};
 	$scope.gameSlotData = function() {
 		var id = database.getGameInDev();
-		if (id != null)
-			return $scope.data.games[id];
+		if (id != null) {
+			return {
+				name: $scope.data.games[id].name,
+				genre: Helper.gameData.genres[$scope.data.games[id].genre],
+				target: Helper.gameData.target_ages[$scope.data.games[id].target],
+				concept: Helper.gameData.concepts[$scope.data.games[id].concept]
+			};
+		}
 		else
 			return null;
 	};
@@ -348,6 +395,21 @@ var Modal_Newcompany_Controller = function ($scope, $modalInstance) {
 
 	$scope.cancel = function() {
 		$modalInstance.close("");
+	};
+};
+
+var Modal_Profit_Controller = function ($scope, $modalInstance, data) {
+	$scope.data = data;
+
+	$scope.getClass = function(differnce) {
+		if (differnce > 0)
+			return "glyphicon-plus text-success";
+		else
+			return "glyphicon-minus text-warning";
+	};
+
+	$scope.close = function() {
+		$modalInstance.close(true);
 	};
 };
 

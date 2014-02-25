@@ -70,6 +70,8 @@ var Levels = {
 	toCollectPrem : function(level) {
 		return Levels.calculate(level, Levels.data.collect.prem);
 	},
+
+	//needs to be oppisite way round, so the higher level the shorter the time
 	toCollectTime : function(level) {
 		return Levels.data.collect.time.max - Levels.calculate(level, Levels.data.collect.time);
 	},
