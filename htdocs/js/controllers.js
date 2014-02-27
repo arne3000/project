@@ -110,6 +110,8 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libr
         mytimeout = $timeout($scope.onTimeout,10000);
     };
 
+    $scope.GetCompanyDate();
+
 	var mytimeout = $timeout($scope.onTimeout,10000);
 };
 

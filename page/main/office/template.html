@@ -7,9 +7,9 @@
 		<div class="col-md-10">
 			<h4>{{gameSlotData().name}}</h4>
 			<ul class="list-inline">
-				<li><h5>Genre <small>{{gameSlotData().genre}}</small></h5></li>
-				<li><h5>Target Audience <small>{{gameSlotData().target}}</small></h5></li>
-				<li><h5>Copy Of <small>{{gameSlotData().concept}}</small></h5></li>
+				<li><h5><span class="glyphicon glyphicon-tag"></span> <small>{{gameSlotData().genre}}</small></h5></li>
+				<li><h5><span class="glyphicon glyphicon-user"></span> <small>{{gameSlotData().target}}</small></h5></li>
+				<li><h5><span class="glyphicon glyphicon-copyright-mark"></span> <small>{{gameSlotData().concept}}</small></h5></li>
 			</ul>
 			<div class="bar bar-sm bar-dev_progress">
 				<div class="bar-inner" ng-style="{right: 100-gameSlotData().devProgress+'%'}"></div>

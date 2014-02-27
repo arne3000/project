@@ -155,7 +155,7 @@ var Helper = {
 		return {right: (100-value)+'%'};
 	},
 
-	inGameYear : 4000, //86400
+	inGameYear : 86400,
 
 	calculateGameYears: function(timestamp) {
 		var diff = Helper.getUnixTimestamp() - timestamp;
