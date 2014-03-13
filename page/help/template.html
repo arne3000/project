@@ -1,0 +1,55 @@
+<div class="container" id="main_view">
+	<div class="row">
+		<div class="col-md-2">
+			<a class="navbar-brand logoimage small" ui-sref="main">
+				<img src="htdocs/img/logo.png" class="img-responsive" alt="Social Game Tycoon">
+			</a>
+		</div>
+		<div class="col-md-7">
+			<ul id="mainNav" class="nav nav-pills nav-justified">
+				<li><a ui-sref="main.office">Home</a></li>
+				<li class="active"><a ui-sref="help">Help</a></li>
+				<li><a ui-sref="about">About</a></li>
+				<li><a ui-sref="shop">Shop</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a ui-sref="terms">Terms and Conditions</a></li>
+						<li><a ng-click="removeAccount()">Remove Account</a></li>
+						<li class="divider"></li>
+						<li><a ng-click="logout()">Logout</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 well well-lg">
+			<h1>Help</h1>
+			<p>
+				Social Game Tycoon is game about making social games! You can create a game idea then click workers to develop your game, once the games development bar is full your game can be launched and start earning you coins!
+			</p>
+			<br/>
+			<h3>Studio</h3>
+			<p>
+				This is the main screen you land on and acts as a central point for all information. The desks lined up in the centre can all be clicked to add new workers, the more workers the more jobs can be initiated.
+			</p>
+			<p>
+				The game slot is presented above the desks, you can add a game idea here if available. If a game idea is added, you can see a brief description about it and its progress. Once the progress bar is filled you can launch your game!
+			</p>
+			<p>
+				Once a game is launched it is sent to your active games section to the right of the screen, you will see all your games here once developed. Every in game year you will be presented with your profit report, you should be able see how well our game is doing and how much it has earned you. Hit the cog to reveal settings for the game, you can un-publish and look at its history.
+			</p>
+			<br/>
+			<h3>Worker</h3>
+			<p>
+				If you click a workers desk from the studio it will present you with the worker page, here you will be able to see all the states related to the worker. A list of various actions are also present here, ‘Fire’ will fire your worker from your company and remove him from the studio. ‘Teach’ will increase the level of the worker and make them produce better work and faster but at a higher cost, this button will cost according to the level of the worker. ‘Start Job’ will initiate work and will add this work after being completed to the progress of the game in development, cost coins!
+			</p>
+			<br/>
+			<h3>Add Game</h3>
+			<p>
+				Adding a game is very simple, pick the options you think will sell best and think of a catchy name then click add, this will progress as workers complete jobs and once filled can be launched to make money.
+			</p>
+		</div>
+	</div>
+</div>

@@ -62,6 +62,27 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         url: "/exit",
         templateUrl: "page/exit/template.html"
     })
+    .state('about', {
+        url: "/about",
+        templateUrl: "page/about/template.html", 
+        controller: 'Menu_Controller'
+    })
+    .state('help', {
+        url: "/help",
+        templateUrl: "page/help/template.html", 
+        controller: 'Menu_Controller'
+    })
+    .state('terms', {
+        url: "/terms",
+        templateUrl: "page/terms/template.html", 
+        controller: 'Menu_Controller'
+    })
+    .state('shop', {
+        url: "/shop",
+        templateUrl: "page/shop/template.html", 
+        controller: 'Menu_Controller'
+    })
+
     //main game loop
     .state('main', {
         url: "/main",
@@ -162,48 +183,10 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
             }
         },
 
-        createAdmin: function() {
-            var _data = $firebase(new Firebase(_url));
-
-            _data.admin = {
-                user : {
-                    intial_currency : 1000,
-                    intial_premium : 50
-                },
-                game : {
-                    progress_amount : 1,
-                    genres : ["adventure", "stratergy", "arcade", "clicking", "shooter", "educational", "simulation"],
-                    concepts : ["tetris", "chess"],
-                    target_ages : ["10 or less", "10 to 20", "20 to 30", "30 and above"]
-                },
-                worker : {
-                    names : [
-                        "Darby Bagley", "Marti Mello", "Frieda Swan", "Elza Quinones", "Carlena Mccurdy", "Deja Spangler", "Doloris Agee", "Buffy Aleman", "Merrie Mccutcheon", "Lenora Heinz",
-                        "Karma Houghton", "Merrilee Easterling", "Alida Middleton", "Vernita Lovelace", "James Ezell", "Shayne Spangler", "Lane Agee", "Kyra Bagley", "Hyo Bagley", "Lisha Bagley", 
-                        "Devon Bagley", "Eustolia Mello", "Khadijah Swan", "Layne Quinones"
-                        ],
-                    levels : {
-                        level: { min: 1, max: 30 },
-                        collect : { 
-                            amount : 1,
-                            cost : { min: 5, max: 1000 },
-                            prem : { min: 1, max: 30 },
-                            time : { min: 30, max: 3600 }
-                        },
-                        progress : { 
-                            amount : 10,
-                            cost : { min: 50, max: 1000 }
-                        },
-                        work : { 
-                            innovation : { min: 10, max: 92 },
-                            optimisation : { min: 6, max: 89 },
-                            quality : { min: 2, max: 97 }
-                        }
-                    }
-                }
-            };
-
-            _data.$save('admin');
+        removeAccount: function() {
+            data.$remove();
+            initialised = false;
+            auth.logout();
         },
 
         //manipulative functions
@@ -282,6 +265,11 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
                 data.$save();
             }
         },
+        addReward: function() {
+            data.company.currency += 10000;
+            data.company.prem_currency += 20;
+            data.$save();
+        },
 
         createGame: function(_name, _genre, _concept, _target) {
             if (typeof data.games == "undefined")
@@ -332,6 +320,24 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
             data.$save();
 
             return output;
+        }
+    };
+});
+
+
+myapp.factory('messagebox', function myMessageboxService($modal) {
+    return {
+        confirmation: function(_text, _event) {
+            var modalInstance = $modal.open({
+                templateUrl: 'page/modal/confirmation/template.html',
+                controller: Modal_Confirmation_Controller,
+                resolve : { text: function() { return _text; } }
+            });
+            modalInstance.result.then(function (confrim) {
+                if (confrim == true) { 
+                    _event();
+                }
+            });
         }
     };
 });

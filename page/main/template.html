@@ -14,8 +14,8 @@
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
 					<ul class="dropdown-menu">
-						<li><a>Terms and Conditions</a></li>
-						<li><a>Remove Account</a></li>
+						<li><a ui-sref="terms">Terms and Conditions</a></li>
+						<li><a ng-click="removeAccount()">Remove Account</a></li>
 						<li class="divider"></li>
 						<li><a ng-click="logout()">Logout</a></li>
 					</ul>
@@ -43,8 +43,7 @@
 				<div class="panel-body">
 					<div ng-show="activegames()" class="alert alert-info game_display" ng-repeat="game in data.games | filter:{ state: activeGameState }">
 						<strong>{{game.name}}</strong>
-						<button type="button" class="btn btn-game btn-xs pull-right"><span class="glyphicon glyphicon-cog"></span></button>
-
+						<button type="button" class="btn btn-game btn-xs pull-right" ng-click="GameClick(game)" ><span class="glyphicon glyphicon-cog"></span></button>
 						<p class="pull-right">{{game.popularity}}</p>
 					</div>
 					<div ng-hide="activegames()" class="alert alert-danger">

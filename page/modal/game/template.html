@@ -1,0 +1,15 @@
+<div class="modal-header">
+	<h3>{{data.name}}</h3>
+</div>
+<div class="modal-body">
+	<ul>
+		<li>Profit per User {{data.ppu}}</li>
+		<li>Popularity {{data.popularity}}</li>
+		<li>Innovation {{data.stats.innovation}}</li>
+		<li>Optimisation {{data.stats.optimisation}}</li>
+		<li>Quality {{data.stats.quality}}</li>
+	</ul>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary btn-block" ng-click="close()">Close</button>
+</div>

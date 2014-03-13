@@ -25,8 +25,8 @@ var Helper = {
 
 	gameData : {
 		genres : ["adventure", "stratergy", "arcade", "clicking", "shooter", "educational", "simulation"],
-		concepts : ["tetris", "age of empires", "chess"],
-		target_ages : ["0 to 10", "10 to 20", "20 to 30", "30 to 5000"]
+		concepts : ["Tetris", "Bejeweled", "Chess", "Flappy Bird", "Poker"],
+		target_ages : ["10 and under", "10 to 20", "20 to 30", "30 and above"]
 	},
 
 	randNum : function(min, max) {

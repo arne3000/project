@@ -10,18 +10,8 @@
 		Do you lack the skills? enjoy money? then this is the job for you!
 		<br/><br/>
 	</p>
-	<p class="muted">
-		<em>
-			This is a satirical look at social games for purposes of a final year project by Arne Ubelhor for the University of Lincoln.
-			<br/>
-		</em>
-	</p>
-
-	<button type="button" class="btn btn-primary" ng-model="form.readterms" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">
-        I've read the terms of service
-    </button>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-primary {{set_state(form.companyname, form.readterms)}}" ng-click="ok(form.companyname, form.readterms)">Start</button>
+	<button class="btn btn-primary {{set_state(form.companyname)}}" ng-click="ok(form.companyname)">Start</button>
 	<button class="btn btn-danger" ng-click="cancel()">Cancel</button>
 </div>

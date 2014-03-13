@@ -1,0 +1,40 @@
+<div class="container" id="main_view">
+	<div class="row">
+		<div class="col-md-2">
+			<a class="navbar-brand logoimage small" ui-sref="main">
+				<img src="htdocs/img/logo.png" class="img-responsive" alt="Social Game Tycoon">
+			</a>
+		</div>
+		<div class="col-md-7">
+			<ul id="mainNav" class="nav nav-pills nav-justified">
+				<li><a ui-sref="main.office">Home</a></li>
+				<li><a ui-sref="help">Help</a></li>
+				<li class="active"><a ui-sref="about">About</a></li>
+				<li><a ui-sref="shop">Shop</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a ui-sref="terms">Terms and Conditions</a></li>
+						<li><a ng-click="removeAccount()">Remove Account</a></li>
+						<li class="divider"></li>
+						<li><a ng-click="logout()">Logout</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 well well-lg">
+			<h1>About</h1>
+			<p>
+				Social Game Tycoon is a game created by Arne Ubelhor as part of a dissertation project for the University of Lincoln. The game was created in order to better understand and comprehend the design of social games. 
+			</p><br/>
+			<p>
+				For the purposes of the study I will be collecting data anonymously of how you interact with the game world and any opinions I survey, best efforts will be made to not make the data identifiable.
+			</p><br/>
+			<p>
+				If you have any questions regarding the game please don’t hesitate to contact me: <a href="mailto:08159902@students.lincoln.ac.uk?subject=Regarding%20Social%20Game%20Tycoon" target="_blank">Send Email</a>
+			</p>
+		</div>
+	</div>
+</div>

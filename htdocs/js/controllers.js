@@ -1,6 +1,25 @@
 /************************
 	CONTROLLERS
 ************************/
+function Menu_Controller($scope, $state, database, messagebox) { 
+	$scope.logout = function() {
+		database.logout();
+		$state.go('login');
+	};
+	$scope.removeAccount = function() {
+		messagebox.confirmation("Are you sure you want to remove your account, it will not be recoverable?", function() {
+			database.removeAccount();
+			$state.go('login');
+		});
+	};
+	$scope.takesurvey = function() {
+		var surveyurl = "https://www.surveymonkey.com/s/R57XZFX";
+		window.open (surveyurl, 'newwindow', config='height=600,width=600, toolbar=no, menubar=no, scrollbars=no, resizable=yes,location=no, directories=no, status=no');
+		database.addReward();
+		$state.go('main.office');
+	};
+};
+
 //login
 function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, database) { 
 	$scope.completed = false;
@@ -34,20 +53,33 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 					//must be a new user!
 					$scope.completed = true;
 					$modal.open({
-						templateUrl: 'page/modal/newcompany/template.html',
-						controller: Modal_Newcompany_Controller,
+						templateUrl: 'page/modal/start/template.html',
+						controller: Modal_Start_Controller,
 						backdrop: 'static',
 						keyboard: false
-					}).result.then(function(companyname) { 
-						if (companyname === "") {
+					}).result.then(function(agree) { 
+						if (agree === false) {
 							database.logout();
 							$state.go('exit');
 						} else {
-							//set up account hereeeee
-							database.initialSetup(companyname);
-							$state.go('main.office');
+							$modal.open({
+								templateUrl: 'page/modal/newcompany/template.html',
+								controller: Modal_Newcompany_Controller,
+								backdrop: 'static',
+								keyboard: false
+							}).result.then(function(companyname) { 
+								if (companyname === "") {
+									database.logout();
+									$state.go('exit');
+								} else {
+									//set up account hereeeee
+									database.initialSetup(companyname);
+									$state.go('main.office');
+								}
+							});
 						}
 					});
+					
 				}
 				break;
 			case 2:
@@ -60,7 +92,7 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 };
 
 //main game loop
-function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database) {
+function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database, messagebox) {
 	console.log("Main_Controller");
 	$scope.data = database.get();
 
@@ -82,6 +114,14 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libr
 		}
 	};
 
+	$scope.GameClick = function(game) {
+		$modal.open({
+			templateUrl: 'page/modal/game/template.html',
+			controller: Modal_Game_Controller,
+			resolve: { data: function() { return game; } }
+		});
+	};
+
 	$scope.CheckTriggers = function() {
 		if ($scope.activegames()) {
 			var time = $scope.data.company.timestamp;
@@ -93,6 +133,7 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libr
 				$modal.open({
 					templateUrl: 'page/modal/profit/template.html',
 					controller: Modal_Profit_Controller,
+					backdrop: 'static',
 					resolve: { data: function() { return displaydata; }	}
 				});
 			}
@@ -104,12 +145,20 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libr
 		$state.go('login');
 	};
 
+	$scope.removeAccount = function() {
+		messagebox.confirmation("Are you sure you want to remove your account, it will not be recoverable?", function() {
+			database.removeAccount();
+			$state.go('login');
+		});
+	};
+
 	$scope.onTimeout = function(){
 		$scope.GetCompanyDate();
     	$scope.CheckTriggers();
         mytimeout = $timeout($scope.onTimeout,10000);
     };
 
+    $scope.CheckTriggers();
     $scope.GetCompanyDate();
 
 	var mytimeout = $timeout($scope.onTimeout,10000);
@@ -185,6 +234,7 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 		if (id != null) {
 			return {
 				name: $scope.data.games[id].name,
+				progressBarStyle: {right: 100-$scope.data.games[id].devProgress+'%'},
 				genre: Helper.gameData.genres[$scope.data.games[id].genre],
 				target: Helper.gameData.target_ages[$scope.data.games[id].target],
 				concept: Helper.gameData.concepts[$scope.data.games[id].concept]
@@ -238,7 +288,7 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 };
 
 
-function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $stateParams, $firebase, libraries, database) {
+function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $stateParams, $firebase, libraries, database, messagebox) {
 	console.log("Main_Worker_Controller");
 	$scope.data = database.get();
 	$scope.id = $stateParams.id;
@@ -266,15 +316,9 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
     		},
     		click : function() {
     			if ($scope.data.workers.length > 1 && $scope.worker.state == WorkerData.states.inactive) {
-					$modal.open({
-						templateUrl: 'page/modal/confirmation/template.html',
-						controller: Modal_Confirmation_Controller,
-						resolve: { text: function () { return "Are you sure you want to fire?"; } }
-					}).result.then(function (confirm) { 
-						if(confirm == true) {
-							database.removeWorker($scope.id);
-							$state.go("main.office");
-						}
+    				messagebox.confirmation("Are you sure you want to fire?", function() {
+						database.removeWorker($scope.id);
+						$state.go("main.office");
 					});
 		    	}
     		}
@@ -378,25 +422,35 @@ var Modal_Hireworker_Controller = function ($scope, $modalInstance, userlevel) {
 };
 
 var Modal_Newcompany_Controller = function ($scope, $modalInstance) {
-	$scope.set_state = function(_nameModel, _checkModel) {
-		if (_nameModel == null || _checkModel == null)
+	$scope.set_state = function(_nameModel) {
+		if (_nameModel == null)
 			return "disabled";
 		else {
-			if (_nameModel == "" || _checkModel == 0)
+			if (_nameModel == "")
 				return "disabled";
 			else
 				return "";
 		}
 	};
 
-	$scope.ok = function(_nameModel, _checkModel) {
-		if (_nameModel != "" && _checkModel == 1) {
+	$scope.ok = function(_nameModel) {
+		if (_nameModel != "") {
 			$modalInstance.close(_nameModel);
 		}
 	};
 
 	$scope.cancel = function() {
 		$modalInstance.close("");
+	};
+};
+
+var Modal_Start_Controller = function ($scope, $modalInstance) {
+	$scope.ok = function() {
+		$modalInstance.close(true);
+	};
+
+	$scope.cancel = function() {
+		$modalInstance.close(false);
 	};
 };
 
@@ -415,21 +469,15 @@ var Modal_Profit_Controller = function ($scope, $modalInstance, data) {
 	};
 };
 
+var Modal_Game_Controller = function ($scope, $modalInstance, data) {
+	$scope.data = data;
 
+	$scope.GetTimeActive = function() {
 
-/************************
-	MESSAGE BOX
-************************/
-ConfirmationBox = function($modal, _text, confirmevent) {
-	var modalInstance = $modal.open({
-		templateUrl: 'page/modal/confirmation/template.html',
-		controller: Modal_Confirmation_Controller,
-		resolve : { text: function() { return _text; } }
-	});
-	modalInstance.result.then(function (confrim) {
-		if (confrim == true) { 
-			confirmevent();
-		}
-	});
+	};
+
+	$scope.close = function() {
+		$modalInstance.close(true);
+	};
 };
 
