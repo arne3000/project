@@ -120,7 +120,7 @@ myapp.config(function($stateProvider, $urlRouterProvider){
 /************************
     SETUP DATABASE FACTORY
 ************************/
-myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
+myapp.factory('database', function myService($firebase, $state) {
     var _url = 'https://socialproject.firebaseio.com/';
     var _ref = null;
     var initialised = false;
@@ -191,8 +191,12 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
 
         //manipulative functions
         addWorker: function(slotid, name, level) {
-            data.workers.push(Helper.createWorker(slotid, name, level));
-            data.$save("workers");
+            cost = Levels.toHireCost(level);
+            if (data.company.currency >= cost) {
+                data.company.currency -= cost;
+                data.workers.push(Helper.createWorker(slotid, name, level));
+                data.$save("workers");
+            }
         },
         removeWorker: function(slotid) {
             data.$child("workers").$remove(slotid);
@@ -233,7 +237,7 @@ myapp.factory('database', function myService($firebase, $firebaseAuth, $state) {
                 var gameID = this.getGameInDev();
 
                 if (data.games[gameID].state == Helper.gameState.development) {
-                    ++data.games[gameID].devProgress;
+                    data.games[gameID].devProgress += Levels.toProgressAmount(data.workers[id].level);
                     data.games[gameID].stats.innovation += Levels.toWorkInnovation(data.workers[id].level);
                     data.games[gameID].stats.optimisation += Levels.toWorkOptimisation(data.workers[id].level);
                     data.games[gameID].stats.quality += Levels.toWorkQuality(data.workers[id].level);

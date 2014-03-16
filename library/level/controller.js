@@ -4,6 +4,7 @@
 var Levels = {
 	data : {
 		level: { min: 1, max: 30 },
+		hirecost: { min: 10, max: 1000 },
 		collect : { 
 			amount : 1,
 			cost : { min: 5, max: 1000 },
@@ -93,10 +94,15 @@ var Levels = {
 		return Levels.calculate(level, Levels.data.work.quality);
 	},
 
+	toHireCost : function(level) {
+		return Levels.calculate(level, Levels.data.hirecost);
+	},
+
 
 	generateData : function(worker_level) {
 		return {
 			relevance: Levels.toRelevance(worker_level),
+			hirecost : Levels.toHireCost(worker_level),
 			collect : { 
 				amount: Levels.toCollectAmount(),
 				cost : Levels.toCollectCost(worker_level),

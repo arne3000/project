@@ -11,8 +11,9 @@
 			    	<h1 class="panel-title text-center">Login</h1>
 				</div>
 				<div class="panel-body">
-					<button type="button" class="btn btn-primary btn-lg btn-block {{btnsState}}" ng-click="login_btn_fb()">Facebook</button>
-					<button type="button" class="btn btn-primary btn-lg btn-block {{btnsState}}" ng-click="login_btn_anon()">Anonymous</button>
+					<button type="button" class="btn btn-primary btn-lg btn-block {{btnsState}}" ng-click="login_btn('facebook')">Facebook</button>
+					<button type="button" class="btn btn-primary btn-lg btn-block {{btnsState}}" ng-click="login_btn('google')">Google</button>
+					<button type="button" class="btn btn-primary btn-lg btn-block {{btnsState}}" ng-click="login_btn('twitter')">Twitter</button>
 				</div>
 				<div ng-show="loading" class="panel-footer">
 			    	<img src="htdocs/img/loading.gif" class="img-responsive center-block loading_anim" alt="Loading...">

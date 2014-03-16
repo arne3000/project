@@ -14,9 +14,9 @@ function Menu_Controller($scope, $state, database, messagebox) {
 	};
 	$scope.takesurvey = function() {
 		var surveyurl = "https://www.surveymonkey.com/s/R57XZFX";
-		window.open (surveyurl, 'newwindow', config='height=600,width=600, toolbar=no, menubar=no, scrollbars=no, resizable=yes,location=no, directories=no, status=no');
-		database.addReward();
-		$state.go('main.office');
+		//window.open (surveyurl, 'newwindow', config='height=600,width=600, toolbar=no, menubar=no, scrollbars=no, resizable=yes,location=no, directories=no, status=no');
+		//database.addReward();
+		//$state.go('main.office');
 	};
 };
 
@@ -24,18 +24,11 @@ function Menu_Controller($scope, $state, database, messagebox) {
 function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, database) { 
 	$scope.completed = false;
 
-	$scope.login_btn_fb = function() {
+	$scope.login_btn = function(_service) {
 		if ($scope.btnsState != "disabled") {
 			$scope.loading = true;
 			$scope.btnsState = "disabled";
-			database.login('facebook');
-		}
-	};
-	$scope.login_btn_anon = function() {
-		if ($scope.btnsState != "disabled") {
-			database.login('anonymous');
-			$scope.loading = true;
-			$scope.btnsState = "disabled";
+			database.login(_service);
 		}
 	};
 
@@ -268,10 +261,23 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 				$scope.slots.setWorkers($scope.data.workers);
 			},
 			empty_slot : function(slotid) {
+				var level_sum = 0;
+
+				for (i = 0; i < $scope.data.workers.length; ++i) {
+					if (typeof $scope.data.workers[i] != "undefined") {
+						level_sum = $scope.data.workers[i].level;
+					}
+				}
+
+				var level_avg = level_sum / $scope.data.workers.length;
+
 				$modal.open({
 					templateUrl: 'page/modal/hireworker/template.html',
 					controller: Modal_Hireworker_Controller,
-					resolve: { userlevel: function () { return $scope.data.company.level; } }
+					resolve: { 
+						baselevel: function () { return level_avg; },
+						usercurrency: function () { return $scope.data.company.currency; }
+					}
 				}).result.then(function (selected) { 
 					database.addWorker(slotid, selected.name, selected.level);
 					$scope.slots.setWorkers($scope.data.workers);
@@ -401,12 +407,13 @@ var Modal_Confirmation_Controller = function ($scope, $modalInstance, text) {
 	};
 };
 
-var Modal_Hireworker_Controller = function ($scope, $modalInstance, userlevel) {
+var Modal_Hireworker_Controller = function ($scope, $modalInstance, baselevel, usercurrency) {
 	$scope.workers = new Array();
 	$scope.selected = 0;
 
 	for (i = 0; i < 4; ++i) {
-		$scope.workers.push({ name: Helper.randName(), level: Helper.randNum(userlevel, userlevel + 2)});
+		var _level = Helper.randNum(baselevel, baselevel + 2);
+		$scope.workers.push({ name: Helper.randName(), level: _level, cost: Levels.toHireCost(_level)});
 	}
 
 	$scope.clickEvent = function(index) { $scope.selected = index; }
@@ -414,7 +421,14 @@ var Modal_Hireworker_Controller = function ($scope, $modalInstance, userlevel) {
 		if ($scope.selected == index) { return "active"; };
 	}
 	$scope.ok = function() {
-		$modalInstance.close($scope.workers[Number($scope.selected)]);
+		if (usercurrency >= $scope.workers[Number($scope.selected)].cost)
+			$modalInstance.close($scope.workers[Number($scope.selected)]);
+	};
+	$scope.ok_state = function() {
+		if (usercurrency >= $scope.workers[Number($scope.selected)].cost)
+			return "ready";
+		else
+			return "disabled";
 	};
 	$scope.cancel = function() {
 		$modalInstance.dismiss('cancel');
