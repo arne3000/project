@@ -72,7 +72,6 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 							});
 						}
 					});
-					
 				}
 				break;
 			case 2:
@@ -85,7 +84,7 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 };
 
 //main game loop
-function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database, messagebox) {
+function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database, messagebox, error_service) {
 	console.log("Main_Controller");
 	$scope.data = database.get();
 
@@ -261,21 +260,18 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 				$scope.slots.setWorkers($scope.data.workers);
 			},
 			empty_slot : function(slotid) {
-				var level_sum = 0;
-
-				for (i = 0; i < $scope.data.workers.length; ++i) {
-					if (typeof $scope.data.workers[i] != "undefined") {
-						level_sum = $scope.data.workers[i].level;
-					}
-				}
-
-				var level_avg = level_sum / $scope.data.workers.length;
-
 				$modal.open({
 					templateUrl: 'page/modal/hireworker/template.html',
 					controller: Modal_Hireworker_Controller,
 					resolve: { 
-						baselevel: function () { return level_avg; },
+						baselevel: function () { 
+							var level_sum = 0;
+							for (i = 0; i < $scope.data.workers.length; ++i) {
+								if (typeof $scope.data.workers[i] != "undefined")
+									level_sum += $scope.data.workers[i].level;
+							}
+							return level_sum / $scope.data.workers.length;
+						},
 						usercurrency: function () { return $scope.data.company.currency; }
 					}
 				}).result.then(function (selected) { 

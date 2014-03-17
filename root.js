@@ -51,7 +51,7 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         resolve: {
             libraries : function($q) {
                 var deferred = $q.defer();
-                loadLibraries(["helper", "level", "error", "metric", "workerdata", "slots"], function(status) {
+                loadLibraries(["helper", "level", "workerdata", "slots"], function(status) {
                     deferred.resolve(status);
                 });
                 return deferred.promise;
@@ -91,7 +91,7 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         resolve: {
             libraries : function($q) {
                 var deferred = $q.defer();
-                loadLibraries(["helper", "level", "error", "metric", "workerdata", "slots"], function(status) {
+                loadLibraries(["helper", "level", "workerdata", "slots"], function(status) {
                     deferred.resolve(status);
                 });
                 return deferred.promise;
@@ -115,18 +115,52 @@ myapp.config(function($stateProvider, $urlRouterProvider){
 
 
 
+/************************
+    SETUP ERROR FACTORY
+************************/
+myapp.factory('error_service', function ErrorService($firebase) {
+    var _url = 'https://socialproject.firebaseio.com/';
+    var data = $firebase(new Firebase(_url+"ERRORS"));
+
+    return {
+        log: function(_code, _message) {
+            data.$add({code: _code, message: _message});
+        }
+    };
+});
+
+/************************
+    SETUP METRICS FACTORY
+************************/
+myapp.factory('metric_service', function MetricService($firebase) {
+    var _url = 'https://socialproject.firebaseio.com/';
+    var data = $firebase(new Firebase(_url+"METRICS"));
+
+    return {
+        NewUser: function() {
+            data.users += 1;
+            data.$save('users');
+        },
+        MoneySpent: function(amount) {
+            data.money_used += amount;
+            data.$save('money_used');
+        }
+    };
+});
+
+
 
 
 /************************
     SETUP DATABASE FACTORY
 ************************/
-myapp.factory('database', function myService($firebase, $state) {
+myapp.factory('database', function DatabaseService($firebase, $state, error_service, metric_service) {
     var _url = 'https://socialproject.firebaseio.com/';
     var _ref = null;
     var initialised = false;
 
     var auth = null;
-    var data = Helper.DefaultData();
+    var data = null;
     var relogFunc = null;
 
 
@@ -136,6 +170,7 @@ myapp.factory('database', function myService($firebase, $state) {
                 if (error) {
                     // an error occurred while attempting login
                     console.log(error);
+                    error_service.log(error.code, error.message);
                     callback(3);
                     initialised = false;
                 } else if (_user) {
@@ -162,10 +197,14 @@ myapp.factory('database', function myService($firebase, $state) {
 
         logout: function() {
             initialised = false;
+            data.$off();
             auth.logout();
+            data = null;
+            auth = null;
         },
 
         initialSetup: function(CompanyName) {
+            metric_service.NewUser();
             initialised = true;
             data.$set(Helper.initUserData(CompanyName));
         },
@@ -194,6 +233,7 @@ myapp.factory('database', function myService($firebase, $state) {
             cost = Levels.toHireCost(level);
             if (data.company.currency >= cost) {
                 data.company.currency -= cost;
+                metric_service.MoneySpent(cost);
                 data.workers.push(Helper.createWorker(slotid, name, level));
                 data.$save("workers");
             }
@@ -254,6 +294,7 @@ myapp.factory('database', function myService($firebase, $state) {
             if (data.company.currency >= cost && Levels.isValid(data.workers[id].level) == true) {
                 data.workers[id].progress += amount;
                 data.company.currency -= cost;
+                metric_service.MoneySpent(cost);
                 //automatically level up
                 if (data.workers[id].progress >= 100) {
                     ++data.workers[id].level;
@@ -265,6 +306,7 @@ myapp.factory('database', function myService($firebase, $state) {
         workerStartJob: function(id, cost) {
             if (data.company.currency >= cost && data.workers[id].timestamp <= 0 && this.gamesInDev() > 0) {
                 data.company.currency -= cost;
+                metric_service.MoneySpent(cost);
                 data.workers[id].timestamp = Helper.getUnixTimestamp();
                 data.$save();
             }
@@ -329,7 +371,8 @@ myapp.factory('database', function myService($firebase, $state) {
 });
 
 
-myapp.factory('messagebox', function myMessageboxService($modal) {
+
+myapp.factory('messagebox', function MessageboxService($modal) {
     return {
         confirmation: function(_text, _event) {
             var modalInstance = $modal.open({
