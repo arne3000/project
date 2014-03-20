@@ -5,11 +5,14 @@
 	<ul>
 		<li>Profit per User {{data.ppu}}</li>
 		<li>Popularity {{data.popularity}}</li>
-		<li>Innovation {{data.stats.innovation}}</li>
-		<li>Optimisation {{data.stats.optimisation}}</li>
-		<li>Quality {{data.stats.quality}}</li>
 	</ul>
+	<div class="worker_stats stat_outer">
+		<div class="stat stat_innovation" ng-style="BarStyle_statsI()" popover="Innovation" popover-trigger="mouseenter"></div>
+		<div class="stat stat_optimisation" ng-style="BarStyle_statsO()" popover="Optimisation" popover-trigger="mouseenter"></div>
+		<div class="stat stat_quality" ng-style="BarStyle_statsQ()" popover="Quality" popover-trigger="mouseenter"></div>
+	</div>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-primary btn-block" ng-click="close()">Close</button>
+	<button class="btn btn-danger" ng-click="unpublish()">Unpublish Game</button>
+	<button class="btn btn-primary" ng-click="close()">Close</button>
 </div>

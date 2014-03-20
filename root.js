@@ -32,7 +32,7 @@ function loadLibraries(libsToLoad, callback) {
 /************************
 	DECLARATION
 ************************/
-var myapp = angular.module('myapp', ["ui.router", "ui.bootstrap", "firebase", "ngRoute"]);
+var myapp = angular.module('myapp', ["ui.router", "ui.bootstrap", "firebase", "ngRoute", "googlechart"]);
 
 
 
@@ -82,6 +82,20 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         templateUrl: "page/shop/template.html", 
         controller: 'Menu_Controller'
     })
+    .state('test', {
+        url: "/test",
+        templateUrl: "page/test/template.html", 
+        controller: 'Test_Controller',
+        resolve: {
+            libraries : function($q) {
+                var deferred = $q.defer();
+                loadLibraries(["helper", "level", "workerdata", "slots"], function(status) {
+                    deferred.resolve(status);
+                });
+                return deferred.promise;
+            }
+        }
+    })
 
     //main game loop
     .state('main', {
@@ -124,7 +138,8 @@ myapp.factory('error_service', function ErrorService($firebase) {
 
     return {
         log: function(_code, _message) {
-            data.$add({code: _code, message: _message});
+            data.push({time: Helper.getUnixTimestamp(), code: _code, message: _message});
+            data.$save();
         }
     };
 });
@@ -139,6 +154,10 @@ myapp.factory('metric_service', function MetricService($firebase) {
     return {
         NewUser: function() {
             data.users += 1;
+            data.$save('users');
+        },
+        RemoveUser: function() {
+            data.users -= 1;
             data.$save('users');
         },
         MoneySpent: function(amount) {
@@ -169,9 +188,14 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
             auth = new FirebaseSimpleLogin(new Firebase(_url), function(error, _user) {
                 if (error) {
                     // an error occurred while attempting login
-                    console.log(error);
-                    error_service.log(error.code, error.message);
-                    callback(3);
+                    
+                    if (error.code == 'USER_DENIED') {
+                        callback(2); // resets the page
+                    } else {
+                        error_service.log(0, error.code + ' - ' +error.message);
+                        callback(3);
+                    }
+                    
                     initialised = false;
                 } else if (_user) {
                     data = $firebase(new Firebase(_url+_user.id));
@@ -223,6 +247,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
         },
 
         removeAccount: function() {
+            metric_service.RemoveUser();
             data.$remove();
             initialised = false;
             auth.logout();
@@ -253,6 +278,9 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
             return noGames;
         },
         gamesActive: function() {
+            if (initialised == false || data == null)
+                return 0;
+
             if (typeof data.games === "undefined")
                 return 0;
 
@@ -277,11 +305,14 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
                 var gameID = this.getGameInDev();
 
                 if (data.games[gameID].state == Helper.gameState.development) {
-                    data.games[gameID].devProgress += Levels.toProgressAmount(data.workers[id].level);
+                    data.games[gameID].devProgress += Levels.toCollectAmount(data.workers[id].level);
                     data.games[gameID].stats.innovation += Levels.toWorkInnovation(data.workers[id].level);
                     data.games[gameID].stats.optimisation += Levels.toWorkOptimisation(data.workers[id].level);
                     data.games[gameID].stats.quality += Levels.toWorkQuality(data.workers[id].level);
                     
+                    if (data.games[gameID].devProgress > 100)
+                        data.games[gameID].devProgress = 100;
+
                     if (data.games[gameID].devProgress >= 100) {
                         data.games[gameID].state = Helper.gameState.launchReady;
                     }
@@ -322,50 +353,121 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
                 data.games = new Array();
 
             if (this.gamesInDev() <= 0) {
-                data.games.push(Helper.initGameData(_name, _genre, _concept, _target));
+                data.games.push(Helper.initGameData(data.games.length, _name, _genre, _concept, _target));
                 data.$save("games");
+            }
+        },
+        removeGame: function(id) {
+            if (typeof data.games === "undefined")
+                return;
+
+            for (i = 0; i < data.games.length; ++i) {
+                if (typeof data.games[i].id != "undefined") {
+                    if (data.games[i].state == Helper.gameState.active && data.games[i].id == id) {
+                        data.games[i].state = Helper.gameState.inactive;
+                        data.$save("games");
+                    }
+                }
             }
         },
         launchGame: function() {
             for (i = 0; i < data.games.length; ++i) {
                 if (data.games[i].state == Helper.gameState.launchReady) {
+                    var new_pop = Helper.GenerateGameStat(30000, 1000, (Levels.data.work.innovation.max * Levels.data.collect.amount), data.games[i].stats.innovation);
+                    var new_ppu = Helper.GenerateGameStat(0.4, 0.1, (Levels.data.work.optimisation.max * Levels.data.collect.amount), data.games[i].stats.optimisation);
+                    var new_peak = Helper.GenerateGameStat(10000000, 10000, (Levels.data.work.quality.max * Levels.data.collect.amount), data.games[i].stats.quality);
+                    var increases = Helper.GetGameGenreIncrease(data.games[i].genre) + Helper.GetGameConceptIncrease(data.games[i].concept) + Helper.GetGameTargettIncrease(data.games[i].target);
+
+                    console.log(new_pop);
+                    console.log(new_peak);
+
                     data.games[i].state = Helper.gameState.active;
                     data.games[i].timeLaunched = Helper.getUnixTimestamp();
-                    data.games[i].popularity = 1000;
-                    data.games[i].peak = 100000;
-                    data.games[i].ppu = 0.1;
-                    data.games[i].rate = 2;
+                    data.games[i].popularity = Math.floor(new_pop + (new_pop * increases));
+                    data.games[i].peak = Math.floor(new_peak + (new_peak * increases));
+                    data.games[i].ppu = new_ppu.toFixed(2);;
+                    data.games[i].rate = 1.5;
+
+                    console.log(data.games[i]);
                 }
             }
             data.$save("games");
         },
         profitCollect: function() {
-            var output = new Array();
+            var created_date = Helper.GetGameDate(data.company.created);
+            var years_collecting = created_date.year - data.company.timestamp;
 
+            var rows = new Array();
+            var columns = new Array();
+            var col_data = new Array();
+            var stats = new Array(data.games.length);
+            var overall_profit = 0;
+
+            columns.push({"id": "year", "label": "Year", "type": "string"});
+
+            col_data.push({ v: "Last Year" });
             for (i = 0; i < data.games.length; ++i) {
+                stats[i] = {active : false};
+
                 if (data.games[i].state == Helper.gameState.active) {
-                    if (data.games[i].popularity*data.games[i].rate > data.games[i].peak && data.games[i].rate > 0) {
-                        data.games[i].rate = -data.games[i].rate;
-                    }
-                    var prev_pop = data.games[i].popularity;
-                    data.games[i].popularity *= data.games[i].rate;
-
-                    var currency_increase = (data.games[i].popularity * data.games[i].ppu);
-                    data.company.currency += currency_increase;
-
-                    output.push({
-                        name: data.games[i].name,
-                        prev_pop: prev_pop,
-                        new_pop: data.games[i].popularity,
-                        currency: currency_increase
+                    
+                    //set up column names
+                    columns.push({
+                        "id": "game"+i,
+                        "label": data.games[i].name,
+                        "type": "number"
                     });
+
+                    //get all data for last years entries
+                    col_data.push({ v: data.games[i].popularity });
+
+                    stats[i].active = true;
+                    stats[i].name = data.games[i].name;
+                    stats[i].popularity = -data.games[i].popularity; // so we can see the difference
+                    stats[i].profit = 0;
                 }
             }
-            data.company.timestamp = Helper.calculateGameTimestamp(data.company.timestamp);
+            rows.push({ c: col_data});
 
+            for (x = 0; x < years_collecting; ++x) {
+                var col_data = new Array();
+                col_data.push({ v: "Year "+(x+1) });
+
+                for (i = 0; i < data.games.length; ++i) {
+                    if (data.games[i].state == Helper.gameState.active) {
+
+                        var new_pop = Math.floor((data.games[i].peak / Helper.randNum(10, 20)) * data.games[i].rate + data.games[i].popularity);
+                        
+                        if (new_pop > data.games[i].peak && data.games[i].rate > 0) 
+                            data.games[i].rate = -data.games[i].rate;
+                        
+                        data.games[i].popularity = new_pop;
+
+                        col_data.push({ v: data.games[i].popularity });
+                        var game_profit = Math.ceil(data.games[i].popularity * data.games[i].ppu);
+                        overall_profit += game_profit;
+
+                        stats[i].popularity += data.games[i].popularity;
+                        stats[i].profit += game_profit;
+                    }
+                }
+
+                rows.push({ c: col_data});
+            }
+
+            data.company.currency += overall_profit;
+            data.company.timestamp = created_date.year;
             data.$save();
-
-            return output;
+            
+            return {
+                profit: overall_profit,
+                collected: years_collecting,
+                gamestats: stats,
+                chartdata: {
+                    "cols": columns, 
+                    "rows": rows
+                }
+            };
         }
     };
 });

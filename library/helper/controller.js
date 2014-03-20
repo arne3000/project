@@ -24,22 +24,54 @@ var Helper = {
 	},
 
 	gameData : {
-		genres : ["adventure", "stratergy", "arcade", "clicking", "shooter", "educational", "simulation"],
+		genres : ["adventure", "strategy", "arcade", "clicking", "shooter", "educational", "simulation"],
 		concepts : ["Tetris", "Bejeweled", "Chess", "Flappy Bird", "Poker"],
 		target_ages : ["10 and under", "10 to 20", "20 to 30", "30 and above"]
+	},
+
+	GetGameGenreIncrease : function(genre) {
+		switch (genre) {
+			case 0: return 0.03;
+			case 1: return 0.06;
+			case 2: return 0.15;
+			case 3: return 0.2;
+			case 4: return 0.07;
+			case 5: return 0.01;
+			case 6: return 0.1;
+		}
+	},
+
+	GetGameConceptIncrease : function(concept) {
+		switch (concept) {
+			case 0: return 0.03;
+			case 1: return 0.2;
+			case 2: return 0.06;
+			case 3: return 0.1;
+			case 4: return 0.07;
+		}
+	},
+
+	GetGameTargettIncrease : function(target) {
+		switch (target) {
+			case 0: return 0.1;
+			case 1: return 0.2;
+			case 2: return 0.1;
+			case 3: return 0.05;
+		}
 	},
 
 	randNum : function(min, max) {
 		return Math.floor((Math.random()*max)+min);
 	},
 
-	initGameData : function(_name, _genre, _concept, _target) {
+	initGameData : function(_id, _name, _genre, _concept, _target) {
 		var output = {
+			id: _id,
 			state: Helper.gameState.development,
 	        name : _name,
-	        genre : _genre,
-	        concept : _concept,
-	        target : _target,
+	        genre : Number(_genre),
+	        concept : Number(_concept),
+	        target : Number(_target),
 	        stats : {
 	            innovation : 1,
 	            optimisation : 1,
@@ -47,7 +79,6 @@ var Helper = {
 	        },
 	        timeCreated : Helper.getUnixTimestamp(),
 	        timeLaunched : 0,
-	        timeLastCollected: 0,
 	        devProgress : 1,
 	        popularity : 1, 
 	        peak : 0,
@@ -58,20 +89,34 @@ var Helper = {
     },
 
 	initUserData : function(companyname) {
+		var game = Helper.initGameData(0, 'MyFirstGame', '1', '3', '2');
+		game.state = Helper.gameState.launchReady;
+		game.devProgress = 100;
+		game.stats = {
+            innovation : 100,
+            optimisation : 100,
+            quality : 100
+        }
+
 		var output = {
 			company : {
 				name : companyname,
-				currency: 1000,
-				prem_currency: 50,
+				currency: 10000,
+				prem_currency: 10,
 				xp: 1,
 				level: 1,
 				timestamp: 0,
 				created: Helper.getUnixTimestamp()
 			},
-			workers : [Helper.createWorker(4, Helper.randName(), 1)],
+			games : [game],
+			workers : [Helper.createWorker(4, Helper.randName(), 1)]
 		};
 
 		return output;
+	},
+
+	GenerateGameStat: function(max_value, min_value, range_max, stat_value) {
+		return (max_value / range_max) * (range_max / stat_value) + min_value;
 	},
 
 	DefaultData : function() {
@@ -157,6 +202,19 @@ var Helper = {
 
 	inGameYear : 86400,
 
+	MONTH : 10,
+
+	GetGameDate: function(timestamp) {
+		var time_since = Helper.getUnixTimestamp() - timestamp;
+		var _month = (time_since / Helper.MONTH) % 12;
+		var _year = ((time_since / Helper.MONTH) / 12);
+
+		return {
+			month: Math.floor(_month),
+			year: Math.floor(_year)
+		};
+	},
+
 	calculateGameYears: function(timestamp) {
 		var diff = Helper.getUnixTimestamp() - timestamp;
 		var multiple = diff / Helper.inGameYear;
@@ -206,7 +264,7 @@ var Helper = {
 	},
 
 	randName : function() {
-		switch (Helper.randNum(1, 25)) {
+		switch (Helper.randNum(1, 26)) {
 			case 1: return "Darby Bagley";
 			case 2: return "Marti Mello";
 			case 3: return "Frieda Swan";
@@ -231,7 +289,8 @@ var Helper = {
 			case 22: return "Eustolia Mello";
 			case 23: return "Khadijah Swan";
 			case 24: return "Layne Quinones";
-			case 25: return "Arne Ubelhor";
+			case 25: return "Sir Andre Uber";
+			case 26: return "Jim Wagnil";
 		};
 	}
 };

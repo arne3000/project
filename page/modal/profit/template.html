@@ -5,17 +5,21 @@
 	<table class="table table-condensed">
 		<tr>
 			<th>Game</th>
-			<th>Popularity</th>
-			<th>Change</th>
+			<th>Popularity Change</th>
 			<th>Profit</th>
 		</tr>
-		<tr ng-repeat="game in data">
+		<tr ng-repeat="game in data.gamestats" ng-show="game.active">
 			<td>{{game.name}}</td>
-			<td>{{game.prev_pop}}</td>
-			<td><span class="glyphicon {{getClass(game.new_pop - game.prev_pop)}}">{{game.new_pop - game.prev_pop}}</span></td>
-			<td>{{game.currency}}</td>
+			<td class="{{cell_state(game.popularity)}}">{{game.popularity}}</td>
+			<td class="{{cell_state(game.profit)}}"><span class="icon icon-currency icon-sm"></span> {{game.profit}}</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td class="{{cell_state(data.profit)}}"><span class="icon icon-currency icon-sm"></span> {{data.profit}}</td>
 		</tr>
 	</table>
+	<div google-chart chart="chartObject" style="height:300px; width:100%;"></div>
 </div>
 <div class="modal-footer">
 	<button class="btn btn-primary btn-block" ng-click="close()">Close</button>

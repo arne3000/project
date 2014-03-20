@@ -4,11 +4,11 @@
 <div class="modal-body">
 	<ul class="nav nav-pills nav-stacked">
 		<li class="animate-repeat {{state($index)}}" ng-repeat="worker in workers">
-			<a ng-click="clickEvent($index)">{{worker.name}}  <strong>level: {{worker.level}}</strong> <p class="pull-right">{{worker.cost}} <span class="icon icon-currency icon-sm"></span></p></a>
+			<a ng-click="clickEvent($index)">{{worker.name}}  <strong>level: {{worker.level}}</strong> <p class="pull-right"><span class="icon icon-currency icon-sm"></span> {{worker.cost}}</p></a>
 		</li>
 	</ul>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-primary {{ok_state()}}" ng-click="ok()">Hire {{workers[selected].name}} for {{workers[selected].cost}} <span class="icon icon-currency icon-sm"></span></button>
+	<button class="btn btn-primary {{ok_state()}}" ng-click="ok()">Hire {{workers[selected].name}} for <span class="icon icon-currency icon-sm"></span> {{workers[selected].cost}}</button>
 	<button class="btn btn-danger" ng-click="cancel()">Cancel</button>
 </div>

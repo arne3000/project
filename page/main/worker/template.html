@@ -2,9 +2,17 @@
 	<button class="btn btn-default back_btn" ng-click="back()">Back</button>
 	<div class="worker_headshot"></div>
 	<div class="worker_buttons">
-		<button class="btn btn-block btn-danger {{firebtn().state()}}" ng-click="firebtn().click()">{{firebtn().text()}}</button>
-		<button class="btn btn-block btn-success {{learnbtn().state()}}" ng-click="learnbtn().click()">{{learnbtn().text()}}</button>
-		<button class="btn btn-block btn-primary {{jobbtn().state()}}" ng-click="jobbtn().click()">{{jobbtn().text()}}</button>
+		<button class="btn btn-block btn-danger {{firebtn().state()}}" ng-click="firebtn().click()">{{firebtn().text().main}}</button>
+		<button class="btn btn-block btn-success {{learnbtn().state()}}" ng-click="learnbtn().click()">
+			{{learnbtn().text().main}}
+			<span ng-show="learnbtn().text().money_active" class="icon icon-currency icon-sm"></span>
+			{{learnbtn().text().money_value}}
+		</button>
+		<button class="btn btn-block btn-primary {{jobbtn().state()}}" ng-click="jobbtn().click()">
+			{{jobbtn().text().main}}
+			<span ng-show="jobbtn().text().money_active" class="icon icon-currency icon-sm"></span>
+			{{jobbtn().text().money_value}}
+		</button>
 	</div>
 	<div class="worker_details">
 		<h1>{{worker.name}}</h1>

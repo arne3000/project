@@ -4,16 +4,16 @@
 var Levels = {
 	data : {
 		level: { min: 1, max: 30 },
-		hirecost: { min: 10, max: 1000 },
+		hirecost: { min: 100, max: 35000 },
 		collect : { 
-			amount : 1,
-			cost : { min: 5, max: 1000 },
+			amount : 15,
+			cost : { min: 100, max: 10000 },
 			prem : { min: 1, max: 30 },
 			time : { min: 10, max: 600 }
 		},
 		progress : { 
 			amount : 10,
-			cost : { min: 50, max: 1000 }
+			cost : { min: 200, max: 20000 }
 		},
 		work : { 
 			innovation : { min: 10, max: 92 },
@@ -97,7 +97,6 @@ var Levels = {
 	toHireCost : function(level) {
 		return Levels.calculate(level, Levels.data.hirecost);
 	},
-
 
 	generateData : function(worker_level) {
 		return {

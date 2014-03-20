@@ -83,15 +83,20 @@ function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, da
 	});
 };
 
+
+
+function Test_Controller($scope, $timeout, libraries, database, messagebox) {
+	
+}
+
+
+
 //main game loop
 function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database, messagebox, error_service) {
-	console.log("Main_Controller");
 	$scope.data = database.get();
 
-	$scope.years = 0;
-	$scope.months = 0;
 	$scope.activeGameState = Helper.gameState.active;
-	$scope.ingameyear = Helper.inGamerYear;
+	$scope.profit_report_active = false;
 
 	$scope.activegames = function() {
 		if (database.gamesActive() > 0)
@@ -99,11 +104,9 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libr
 		else
 			return false;
 	};
-	$scope.GetCompanyDate = function() {
-		if (typeof $scope.data.company != "undefined") {
-			$scope.years = Helper.calculateGameYears($scope.data.company.created);
-			$scope.months = Helper.calculateGameMonths($scope.data.company.created);
-		}
+	$scope.GetCompanyDate = function(created_timestamp) {
+		var time = Helper.GetGameDate(created_timestamp);
+		return time.year+" yrs "+ time.month +" mths";
 	};
 
 	$scope.GameClick = function(game) {
@@ -111,25 +114,11 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libr
 			templateUrl: 'page/modal/game/template.html',
 			controller: Modal_Game_Controller,
 			resolve: { data: function() { return game; } }
-		});
-	};
-
-	$scope.CheckTriggers = function() {
-		if ($scope.activegames()) {
-			var time = $scope.data.company.timestamp;
-			if (time <= 0)
-				time = $scope.data.company.created;
-
-			if (Helper.calculateGameYears(time) >= 1) {
-				var displaydata = database.profitCollect();
-				$modal.open({
-					templateUrl: 'page/modal/profit/template.html',
-					controller: Modal_Profit_Controller,
-					backdrop: 'static',
-					resolve: { data: function() { return displaydata; }	}
-				});
+		}).result.then(function(remove_game) { 
+			if (remove_game == true) {
+				database.removeGame(game.id);
 			}
-		}
+		});
 	};
 
 	$scope.logout = function() {
@@ -145,20 +134,34 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libr
 	};
 
 	$scope.onTimeout = function(){
-		$scope.GetCompanyDate();
-    	$scope.CheckTriggers();
-        mytimeout = $timeout($scope.onTimeout,10000);
+		if (typeof $scope.data != "undefined") {
+			if ($scope.activegames()) {
+				$scope.date_created = Helper.GetGameDate($scope.data.company.created);
+				$scope.last_collected = $scope.date_created.year - $scope.data.company.timestamp;
+
+				if ($scope.last_collected >= 1 && $scope.profit_report_active == false) {
+					$scope.profit_report_active = true;
+					var displaydata = database.profitCollect();
+					$modal.open({
+						templateUrl: 'page/modal/profit/template.html',
+						controller: Modal_Profit_Controller,
+						backdrop: 'static',
+						resolve: { data: function() { return displaydata; }	}
+					}).result.then(function () {
+						$scope.profit_report_active = false;
+					})
+				}
+			}
+		}
+
+        mytimeout = $timeout($scope.onTimeout, Helper.MONTH);
     };
 
-    $scope.CheckTriggers();
-    $scope.GetCompanyDate();
-
-	var mytimeout = $timeout($scope.onTimeout,10000);
+	var mytimeout = $timeout($scope.onTimeout, Helper.MONTH);
 };
 
 //add a new game
 function Main_Addgame_Controller($scope, $state, libraries, database) {
-	console.log("Main_Addgame_Controller");
 	$scope.data = database.get();
 
 	if (database.gamesInDev() > 0)
@@ -200,7 +203,6 @@ function Main_Addgame_Controller($scope, $state, libraries, database) {
 };
 
 function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebase, libraries, database) {
-	console.log("Main_Office_Controller");
 	$scope.data = database.get();
 	$scope.data.$on("change", function() {
 		$scope.slots.setWorkers($scope.data.workers);
@@ -291,7 +293,6 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 
 
 function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $stateParams, $firebase, libraries, database, messagebox) {
-	console.log("Main_Worker_Controller");
 	$scope.data = database.get();
 	$scope.id = $stateParams.id;
 	$scope.worker = WorkerData.construct($scope.id, $scope.data.workers[$scope.id]);
@@ -301,14 +302,12 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
 		$scope.worker = WorkerData.construct($scope.id, $scope.data.workers[$scope.id]);
 	});
 
-	console.log($scope.worker);
-
 	$scope.back = function() { $state.go("main.office"); };
 
     $scope.firebtn = function() {
     	return {
     		text : function() {
-    			return "Fire";
+    			return { main: 'Fire', money_active: false, money_value: null	};
     		},
     		state : function() {
     			if ($scope.data.workers.length <= 1 || $scope.worker.state != WorkerData.states.inactive)
@@ -330,7 +329,16 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
 	$scope.learnbtn = function() {
     	return {
     		text : function() {
-    			return "Teach";
+    			var output = { main: '', money_active: false, money_value: null	};
+    			if ($scope.worker.state == WorkerData.states.inactive) {
+	    			output.main = 'Teach';
+	    			output.money_active = true;
+	    			output.money_value = $scope.worker.stats.progress.cost;
+	    		} else {
+	    			output.main = 'Finish Job'
+	    		}
+				
+				return output
     		},
     		state : function() {
     			if ($scope.data.company.currency < $scope.worker.stats.progress.cost || $scope.worker.state != WorkerData.states.inactive)
@@ -350,18 +358,25 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
 	$scope.jobbtn = function() {
     	return {
     		text : function() {
+    			var output = { main: '', money_active: false, money_value: null	};
+
     			if (database.gamesInDev() <= 0)
-    				return "No Development";
+    				output.main = "No Development";
     			else {
-    				if ($scope.worker.state == WorkerData.states.inactive)
-						return "Start Job $"+$scope.worker.stats.collect.cost;
+    				if ($scope.worker.state == WorkerData.states.inactive) {
+    					output.main = 'Start Job';
+		    			output.money_active = true;
+		    			output.money_value = $scope.worker.stats.collect.cost;
+    				}
 					else {
 						if ($scope.worker.state == WorkerData.states.completed)
-							return "Finish Job"
+							output.main = "Finish Job"
 						else
-							return $scope.worker.Text_time();
+							output.main = $scope.worker.Text_time();
 					}
 				}
+
+				return output;
     		},
     		state : function() {
     			if ($scope.data.company.currency < $scope.worker.stats.collect.cost || $scope.worker.state == WorkerData.states.busy || database.gamesInDev() <= 0)
@@ -467,11 +482,18 @@ var Modal_Start_Controller = function ($scope, $modalInstance) {
 var Modal_Profit_Controller = function ($scope, $modalInstance, data) {
 	$scope.data = data;
 
-	$scope.getClass = function(differnce) {
+	$scope.chartObject = {};
+	$scope.chartObject.type = 'LineChart';
+    $scope.chartObject.options = {
+        'title': 'Popularity Changes for '+$scope.data.collected + ' year'
+    }
+    $scope.chartObject.data = data.chartdata;
+
+	$scope.cell_state = function(differnce) {
 		if (differnce > 0)
-			return "glyphicon-plus text-success";
+			return "success";
 		else
-			return "glyphicon-minus text-warning";
+			return "danger";
 	};
 
 	$scope.close = function() {
@@ -482,12 +504,29 @@ var Modal_Profit_Controller = function ($scope, $modalInstance, data) {
 var Modal_Game_Controller = function ($scope, $modalInstance, data) {
 	$scope.data = data;
 
+	$scope.BarStyle_statsI = function() {
+		var max_amount = Levels.data.work.innovation.max * Levels.data.collect.amount;
+		return {top: (100-((100/max_amount) * $scope.data.stats.innovation))+'%'};
+	};
+	$scope.BarStyle_statsO = function() {
+		var max_amount = Levels.data.work.optimisation.max * Levels.data.collect.amount;
+		return {top: (100-((100/max_amount) * $scope.data.stats.optimisation))+'%'};
+	};
+	$scope.BarStyle_statsQ = function() {
+		var max_amount = Levels.data.work.quality.max * Levels.data.collect.amount;
+		return {top: (100-((100/max_amount) * $scope.data.stats.quality))+'%'};
+	};
+
 	$scope.GetTimeActive = function() {
 
 	};
 
-	$scope.close = function() {
+	$scope.unpublish = function() {
 		$modalInstance.close(true);
+	};
+
+	$scope.close = function() {
+		$modalInstance.close(false);
 	};
 };
 
