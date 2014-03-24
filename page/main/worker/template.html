@@ -8,10 +8,20 @@
 			<span ng-show="learnbtn().text().money_active" class="icon icon-currency icon-sm"></span>
 			{{learnbtn().text().money_value}}
 		</button>
+		<button class="btn btn-block btn-success {{learnprembtn().state()}}" ng-click="learnprembtn().click()">
+			{{learnprembtn().text().main}}
+			<span ng-show="learnprembtn().text().money_active" class="icon icon-premcurrency icon-sm"></span>
+			{{learnprembtn().text().money_value}}
+		</button>
 		<button class="btn btn-block btn-primary {{jobbtn().state()}}" ng-click="jobbtn().click()">
 			{{jobbtn().text().main}}
 			<span ng-show="jobbtn().text().money_active" class="icon icon-currency icon-sm"></span>
 			{{jobbtn().text().money_value}}
+		</button>
+		<button ng-show="jobprembtn().active()" class="btn btn-block btn-primary {{jobprembtn().state()}}" ng-click="jobprembtn().click()">
+			{{jobprembtn().text().main}}
+			<span ng-show="jobprembtn().text().money_active" class="icon icon-premcurrency icon-sm"></span>
+			{{jobprembtn().text().money_value}}
 		</button>
 	</div>
 	<div class="worker_details">

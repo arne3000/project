@@ -163,6 +163,10 @@ myapp.factory('metric_service', function MetricService($firebase) {
         MoneySpent: function(amount) {
             data.money_used += amount;
             data.$save('money_used');
+        },
+        PremMoneySpent: function(amount) {
+            data.prem_money_used += amount;
+            data.$save('prem_money_used');
         }
     };
 });
@@ -334,11 +338,28 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
                 data.$save();
             }
         },
+        workerUpgradePrem : function(id, cost) {
+            if (data.company.prem_currency >= cost && Levels.isValid(data.workers[id].level) == true) {
+                data.workers[id].progress = 0;
+                ++data.workers[id].level;
+                data.company.prem_currency -= cost;
+                metric_service.PremMoneySpent(cost);
+                data.$save();
+            }
+        },
         workerStartJob: function(id, cost) {
             if (data.company.currency >= cost && data.workers[id].timestamp <= 0 && this.gamesInDev() > 0) {
                 data.company.currency -= cost;
                 metric_service.MoneySpent(cost);
                 data.workers[id].timestamp = Helper.getUnixTimestamp();
+                data.$save();
+            }
+        },
+        workerFinishJobPrem: function(id, cost) {
+            if (data.company.prem_currency >= cost && this.gamesInDev() > 0) {
+                data.company.prem_currency -= cost;
+                metric_service.PremMoneySpent(cost);
+                data.workers[id].timestamp = 1;
                 data.$save();
             }
         },
@@ -371,6 +392,12 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
             }
         },
         launchGame: function() {
+            if (this.gamesActive() <= 0) {
+                //make sure profit is accurate
+                var created_date = Helper.GetGameDate(data.company.created);
+                data.company.timestamp = created_date.year;
+            }
+
             for (i = 0; i < data.games.length; ++i) {
                 if (data.games[i].state == Helper.gameState.launchReady) {
                     var new_pop = Helper.GenerateGameStat(30000, 1000, (Levels.data.work.innovation.max * Levels.data.collect.amount), data.games[i].stats.innovation);

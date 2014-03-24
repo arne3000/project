@@ -5,6 +5,7 @@ var Levels = {
 	data : {
 		level: { min: 1, max: 30 },
 		hirecost: { min: 100, max: 35000 },
+		hireprem: { min: 1, max: 50 },
 		collect : { 
 			amount : 15,
 			cost : { min: 100, max: 10000 },
@@ -13,7 +14,8 @@ var Levels = {
 		},
 		progress : { 
 			amount : 10,
-			cost : { min: 200, max: 20000 }
+			cost : { min: 20, max: 5000 },
+			prem : { min: 1, max: 10 }
 		},
 		work : { 
 			innovation : { min: 10, max: 92 },
@@ -83,6 +85,9 @@ var Levels = {
 	toProgressCost : function(level) {
 		return Levels.calculate(level, Levels.data.progress.cost);
 	},
+	toProgressPrem : function(level) {
+		return Levels.calculate(level, Levels.data.progress.prem);
+	},
 
 	toWorkInnovation : function(level) {
 		return Levels.calculate(level, Levels.data.work.innovation);
@@ -97,11 +102,15 @@ var Levels = {
 	toHireCost : function(level) {
 		return Levels.calculate(level, Levels.data.hirecost);
 	},
+	toHirePrem : function(level) {
+		return Levels.calculate(level, Levels.data.hireprem);
+	},
 
 	generateData : function(worker_level) {
 		return {
 			relevance: Levels.toRelevance(worker_level),
 			hirecost : Levels.toHireCost(worker_level),
+			hireprem : Levels.toHirePrem(worker_level),
 			collect : { 
 				amount: Levels.toCollectAmount(),
 				cost : Levels.toCollectCost(worker_level),
@@ -110,7 +119,8 @@ var Levels = {
 			},
 			progress : {
 				amount: Levels.toProgressAmount(),
-				cost: Levels.toProgressCost(worker_level)
+				cost: Levels.toProgressCost(worker_level),
+				prem: Levels.toProgressPrem(worker_level)
 			},
 			work : { 
 				innovation : Levels.toWorkInnovation(worker_level),

@@ -64,6 +64,10 @@ var Helper = {
 		return Math.floor((Math.random()*max)+min);
 	},
 
+	GetPremiumCost : function(cost) {
+		return Math.ceil(cost / 50);
+	},
+
 	initGameData : function(_id, _name, _genre, _concept, _target) {
 		var output = {
 			id: _id,
@@ -238,9 +242,9 @@ var Helper = {
 
 	formatUnixTimestamp : function(timestamp) {
 		var date = new Date(timestamp * 1000);
-		var hours = date.getHours();
-		var minutes = date.getMinutes();
-		var seconds = date.getSeconds();
+		var hours = date.getUTCHours();
+		var minutes = date.getUTCMinutes();
+		var seconds = date.getUTCSeconds();
 
 		if (hours <= 0) {
 			if (minutes <= 0) {
@@ -268,26 +272,26 @@ var Helper = {
 			case 1: return "Darby Bagley";
 			case 2: return "Marti Mello";
 			case 3: return "Frieda Swan";
-			case 4: return "Elza Quinones";
+			case 4: return "Dudley McSturm";
 			case 5: return "Carlena Mccurdy";
 			case 6: return "Deja Spangler";
 			case 7: return "Doloris Agee";
 			case 8: return "Buffy Aleman";
 			case 9: return "Merrie Mccutcheon";
-			case 10: return "Lenora Heinz";
+			case 10: return "Adski Howley";
 			case 11: return "Karma Houghton";
 			case 12: return "Merrilee Easterling";
 			case 13: return "Alida Middleton";
 			case 14: return "Vernita Lovelace";
-			case 15: return "James Ezell";
+			case 15: return "Matt Blezz";
 			case 16: return "Shayne Spangler";
 			case 17: return "Lane Agee";
 			case 18: return "Kyra Bagley";
-			case 19: return "Hyo Bagley";
-			case 20: return "Lisha Bagley";
-			case 21: return "Devon Bagley";
+			case 19: return "Dale Noghan";
+			case 20: return "Jess Dell";
+			case 21: return "Lauren Foster";
 			case 22: return "Eustolia Mello";
-			case 23: return "Khadijah Swan";
+			case 23: return "Conah Tait";
 			case 24: return "Layne Quinones";
 			case 25: return "Sir Andre Uber";
 			case 26: return "Jim Wagnil";

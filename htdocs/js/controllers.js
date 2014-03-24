@@ -331,11 +331,11 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
     		text : function() {
     			var output = { main: '', money_active: false, money_value: null	};
     			if ($scope.worker.state == WorkerData.states.inactive) {
-	    			output.main = 'Teach';
+	    			output.main = 'Upgrade';
 	    			output.money_active = true;
 	    			output.money_value = $scope.worker.stats.progress.cost;
 	    		} else {
-	    			output.main = 'Finish Job'
+	    			output.main = 'Busy'
 	    		}
 				
 				return output
@@ -350,6 +350,35 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
     			//make sure player can afford to buy progress and also isn't in progress of a job
 				if ($scope.data.company.currency  >= $scope.worker.stats.progress.cost && $scope.worker.state == WorkerData.states.inactive) {
 					database.workerUpgrade($scope.id, $scope.worker.stats.progress.amount, $scope.worker.stats.progress.cost);
+				}
+    		}
+    	}
+	};
+
+	$scope.learnprembtn = function() {
+    	return {
+    		text : function() {
+    			var output = { main: '', money_active: false, money_value: null	};
+    			if ($scope.worker.state == WorkerData.states.inactive) {
+	    			output.main = 'Upgrade';
+	    			output.money_active = true;
+	    			output.money_value = $scope.worker.stats.progress.prem;
+	    		} else {
+	    			output.main = 'Busy'
+	    		}
+				
+				return output
+    		},
+    		state : function() {
+    			if ($scope.data.company.prem_currency < $scope.worker.stats.progress.prem || $scope.worker.state != WorkerData.states.inactive)
+					return "disabled";
+				else
+					return "";
+    		},
+    		click : function() {
+    			//make sure player can afford to buy progress and also isn't in progress of a job
+				if ($scope.data.company.prem_currency  >= $scope.worker.stats.progress.prem && $scope.worker.state == WorkerData.states.inactive) {
+					database.workerUpgradePrem($scope.id, $scope.worker.stats.progress.prem);
 				}
     		}
     	}
@@ -370,7 +399,7 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
     				}
 					else {
 						if ($scope.worker.state == WorkerData.states.completed)
-							output.main = "Finish Job"
+							output.main = "Finish Job";
 						else
 							output.main = $scope.worker.Text_time();
 					}
@@ -391,6 +420,60 @@ function Main_Worker_Controller($scope, $state, $timeout, $modal, $log, $statePa
     			} else if ($scope.worker.state == WorkerData.states.completed) {
 					database.workerCompleted($scope.id);
 				}
+
+				$scope.worker = WorkerData.construct($scope.id, $scope.data.workers[$scope.id]);
+    		}
+    	}
+	};
+
+	$scope.jobprembtn = function() {
+    	return {
+    		active: function() {
+    			if (database.gamesInDev() <= 0 || $scope.worker.state == WorkerData.states.completed)
+    				return false;
+    			else {
+    				return true;
+				}
+    		},
+    		text : function() {
+    			var output = { main: '', money_active: false, money_value: null	};
+
+				if ($scope.worker.state == WorkerData.states.inactive) {
+					output.main = 'Fast Track';
+	    			output.money_active = true;
+	    			output.money_value = $scope.worker.stats.collect.prem;
+				}
+				else {
+					output.main = 'Encourage';
+	    			output.money_active = true;
+	    			output.money_value = Math.ceil($scope.worker.stats.collect.prem / 2);
+				}
+
+				return output;
+    		},
+    		state : function() {
+    			if (database.gamesInDev() <= 0)
+    				return "disabled";
+
+    			if ($scope.worker.state == WorkerData.states.inactive) {
+					if ($scope.data.company.prem_currency < $scope.worker.stats.collect.prem)
+						return "disabled";
+					else
+						return "";
+				}
+				else {
+					if ($scope.data.company.prem_currency < Math.ceil($scope.worker.stats.collect.prem / 2))
+						return "disabled";
+					else
+						return "";
+				}
+    		},
+    		click : function() {
+    			//start a new job
+    			if ($scope.worker.state == WorkerData.states.inactive)
+					database.workerFinishJobPrem($scope.id, $scope.worker.stats.collect.prem);
+				else 
+					database.workerFinishJobPrem($scope.id, Math.ceil($scope.worker.stats.collect.prem/2));
 
 				$scope.worker = WorkerData.construct($scope.id, $scope.data.workers[$scope.id]);
     		}
