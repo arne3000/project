@@ -67,6 +67,20 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         templateUrl: "page/about/template.html", 
         controller: 'Menu_Controller'
     })
+    .state('signup', {
+        url: "/signup",
+        templateUrl: "page/signup/template.html", 
+        controller: 'Signup_Controller',
+        resolve: {
+            libraries : function($q) {
+                var deferred = $q.defer();
+                loadLibraries(["helper", "level", "workerdata", "slots"], function(status) {
+                    deferred.resolve(status);
+                });
+                return deferred.promise;
+            }
+        }
+    })
     .state('help', {
         url: "/help",
         templateUrl: "page/help/template.html", 
@@ -81,20 +95,6 @@ myapp.config(function($stateProvider, $urlRouterProvider){
         url: "/shop",
         templateUrl: "page/shop/template.html", 
         controller: 'Menu_Controller'
-    })
-    .state('test', {
-        url: "/test",
-        templateUrl: "page/test/template.html", 
-        controller: 'Test_Controller',
-        resolve: {
-            libraries : function($q) {
-                var deferred = $q.defer();
-                loadLibraries(["helper", "level", "workerdata", "slots"], function(status) {
-                    deferred.resolve(status);
-                });
-                return deferred.promise;
-            }
-        }
     })
 
     //main game loop
@@ -132,14 +132,44 @@ myapp.config(function($stateProvider, $urlRouterProvider){
 /************************
     SETUP ERROR FACTORY
 ************************/
-myapp.factory('error_service', function ErrorService($firebase) {
+myapp.factory('error_service', function ErrorService($firebase, $q) {
     var _url = 'https://socialproject.firebaseio.com/';
-    var data = $firebase(new Firebase(_url+"ERRORS"));
+    var data = null;
 
     return {
-        log: function(_code, _message) {
-            data.push({time: Helper.getUnixTimestamp(), code: _code, message: _message});
-            data.$save();
+        initialise: function() {
+            var deferred = $q.defer();
+
+            data = $firebase(new Firebase(_url+"ERRORS"));
+
+            data.$on("loaded", function(value) {
+                deferred.resolve('complete');
+            });
+
+            return deferred.promise;
+        },
+
+        track: function(_message) {
+
+            //calculate browser
+            var N=navigator.appName, ua=navigator.userAgent, tem;
+            var M=ua.match(/(opera|chrome|safari|firefox|msie)\/?\s*(\.?\d+(\.\d+)*)/i);
+            if(M && (tem= ua.match(/version\/([\.\d]+)/i))!= null) M[2]= tem[1];
+            M=M? [M[1], M[2]]: [N, navigator.appVersion, '-?'];
+
+            var error_obj = {
+                time: Helper.getUnixTimestamp(), 
+                browser: M[0], 
+                message: _message
+            }
+
+            if (data == null) {
+                this.initialise().then(function(){
+                    data.$add(error_obj);
+                });
+            } else {
+                data.$add(error_obj);
+            }           
         }
     };
 });
@@ -177,7 +207,7 @@ myapp.factory('metric_service', function MetricService($firebase) {
 /************************
     SETUP DATABASE FACTORY
 ************************/
-myapp.factory('database', function DatabaseService($firebase, $state, error_service, metric_service) {
+myapp.factory('database', function DatabaseService($firebase, $state, $q, $firebaseSimpleLogin, error_service, metric_service) {
     var _url = 'https://socialproject.firebaseio.com/';
     var _ref = null;
     var initialised = false;
@@ -186,54 +216,67 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
     var data = null;
     var relogFunc = null;
 
-
     return {
-        initialise: function(callback) {
-            auth = new FirebaseSimpleLogin(new Firebase(_url), function(error, _user) {
-                if (error) {
-                    // an error occurred while attempting login
-                    
-                    if (error.code == 'USER_DENIED') {
-                        callback(2); // resets the page
-                    } else {
-                        error_service.log(0, error.code + ' - ' +error.message);
-                        callback(3);
-                    }
-                    
-                    initialised = false;
-                } else if (_user) {
-                    data = $firebase(new Firebase(_url+_user.id));
+        initialise: function() {
+            var deferred = $q.defer();
 
-                    //check if its a new user
+            auth = $firebaseSimpleLogin(new Firebase(_url));
+            auth.$getCurrentUser().then(function(userdata) {
+                if (userdata == null) {
+                    initialised = false;
+                    deferred.resolve('user_unlogged');
+                }
+                else {
+                    data = $firebase(new Firebase(_url+userdata.id));
+
                     data.$on("loaded", function(value) {
                         if (value == null) {
-                            callback(1);
-                        } else {
+                            initialised = false;
+                            deferred.resolve('user_new');
+                        }
+                        else {
                             initialised = true;
-                            callback(0);
+                            deferred.resolve('user_logged');
                         }
                     });
-                } else {
-                    callback(2);
                 }
-            });
+            });       
+
+            return deferred.promise;
         },
 
         login: function(method) {
-            auth.login(method);
+            var deferred = $q.defer();
+
+            auth.$login(method).then(function(userdata) {
+                var url = _url+userdata.id;
+                data = $firebase(new Firebase(url));
+                data.$on("loaded", function(value) {
+                    if (value == null) {
+                        initialised = false;
+                        deferred.resolve('user_new');
+                    }
+                    else {
+                        initialised = true;
+                        deferred.resolve('user_logged');
+                    }
+                });
+            });
+
+            return deferred.promise;
         },
 
         logout: function() {
-            initialised = false;
-            data.$off();
-            auth.logout();
+            if (auth != null)
+                auth.$logout();
             data = null;
             auth = null;
+            location.reload();
         },
 
         initialSetup: function(CompanyName) {
-            metric_service.NewUser();
             initialised = true;
+            metric_service.NewUser();
             data.$set(Helper.initUserData(CompanyName));
         },
 
@@ -242,7 +285,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
         },
 
         get: function() {
-            if (initialised == true)
+            if (initialised == true && data != null)
                 return data;
             else {
                 this.relogFunc();
@@ -253,8 +296,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
         removeAccount: function() {
             metric_service.RemoveUser();
             data.$remove();
-            initialised = false;
-            auth.logout();
+            this.logout();
         },
 
         //manipulative functions
@@ -282,7 +324,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
             return noGames;
         },
         gamesActive: function() {
-            if (initialised == false || data == null)
+            if (data == null)
                 return 0;
 
             if (typeof data.games === "undefined")
@@ -365,7 +407,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
         },
         addReward: function() {
             data.company.currency += 10000;
-            data.company.prem_currency += 20;
+            data.company.prem_currency += 50;
             data.$save();
         },
 
@@ -467,6 +509,9 @@ myapp.factory('database', function DatabaseService($firebase, $state, error_serv
                         
                         if (new_pop > data.games[i].peak && data.games[i].rate > 0) 
                             data.games[i].rate = -data.games[i].rate;
+
+                        if (new_pop < -(data.games[i].peak/2) && data.games[i].rate != 0) 
+                            data.games[i].rate = 0;
                         
                         data.games[i].popularity = new_pop;
 

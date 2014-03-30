@@ -7,7 +7,7 @@ var Levels = {
 		hirecost: { min: 100, max: 35000 },
 		hireprem: { min: 1, max: 50 },
 		collect : { 
-			amount : 15,
+			amount : 5,
 			cost : { min: 100, max: 10000 },
 			prem : { min: 1, max: 30 },
 			time : { min: 10, max: 600 }

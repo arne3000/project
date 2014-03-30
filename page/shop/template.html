@@ -7,10 +7,10 @@
 		</div>
 		<div class="col-md-7">
 			<ul id="mainNav" class="nav nav-pills nav-justified">
-				<li class="active"><a ui-sref="main.office">Home</a></li>
+				<li><a ui-sref="main.office">Home</a></li>
 				<li><a ui-sref="help">Help</a></li>
 				<li><a ui-sref="about">About</a></li>
-				<li><a ui-sref="shop">Shop</a></li>
+				<li class="active"><a ui-sref="shop">Shop</a></li>
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
 					<ul class="dropdown-menu">
@@ -26,10 +26,43 @@
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2 well well-lg">
 			<h1>Shop</h1>
-			<p>
-				As this is a dissertation project any real world transactions are halted, however if you want to gain some premium currency please fill out a quick survey and you’ll receive 10 premium coins.
-			</p>
-			<button type="button" class="btn btn-primary" disabled="disabled" ng-click="takesurvey()">Take Survey</button>
+			<hr/>
+			<div class="col-md-4">
+				<div class="thumbnail">
+					<img src="htdocs/img/packs/sd_pack.jpg" alt="...">
+					<div class="caption">
+						<h3>Standard Pack</h3>
+						<p>
+							Get this pack and be rewarded with the following:
+						</p>
+						<ul class="list-unstyled">
+							<li><span class="icon icon-currency icon-sm"></span> 10000</li>
+							<li><span class="icon icon-premcurrency icon-sm"></span> 50</li>
+						</ul>
+						<button type="button" class="btn btn-primary btn-block" ng-click="takesurvey()">Purchase</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="thumbnail">
+					<img src="htdocs/img/packs/pack_disabled.png" alt="Deluxe Pack Unavailable">
+					<div class="caption">
+						<h3>?????????</h3>
+						<p>?????</p>
+						<button type="button" class="btn btn-primary btn-block" disabled="disabled">Purchase</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="thumbnail">
+					<img src="htdocs/img/packs/pack_disabled.png" alt="Wizard Pack Unavailable">
+					<div class="caption">
+						<h3>?????????</h3>
+						<p>?????</p>
+						<button type="button" class="btn btn-primary btn-block" disabled="disabled">Purchase</button>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

@@ -5,13 +5,12 @@
 	<p>
 		Hello there! 
 		<br/><br/>
-		<input id="focusedInput" type="text" class="form-control intialinput" ng-model="form.companyname" placeholder="Name Your Company" required> are looking at hiring a new CEO!
-		<br/>
+		A company named <input id="focusedInput" type="text" class="form-control intialinput" ng-model="form.companyname" placeholder="Name Your Company" required> are looking at hiring a new CEO!
+		<br/><br/>
 		Do you lack the skills? enjoy money? then this is the job for you!
 		<br/><br/>
 	</p>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-primary {{set_state(form.companyname)}}" ng-click="ok(form.companyname)">Start</button>
-	<button class="btn btn-danger" ng-click="cancel()">Cancel</button>
+	<button class="btn btn-primary btn-block {{set_state(form.companyname)}}" ng-click="ok(form.companyname)">Create Company</button>
 </div>

@@ -13,80 +13,72 @@ function Menu_Controller($scope, $state, database, messagebox) {
 		});
 	};
 	$scope.takesurvey = function() {
-		var surveyurl = "https://www.surveymonkey.com/s/R57XZFX";
-		//window.open (surveyurl, 'newwindow', config='height=600,width=600, toolbar=no, menubar=no, scrollbars=no, resizable=yes,location=no, directories=no, status=no');
-		//database.addReward();
-		//$state.go('main.office');
+		var surveyurl = "https://docs.google.com/forms/d/131E3C7XDEHHiSL2vwsJy8plOyHPrcup5xGT7RzOFkEI/viewform";
+		window.open (surveyurl, 'newwindow', config='height=800,width=800, toolbar=no, menubar=no, scrollbars=no, resizable=yes,location=no, directories=no, status=no');
+		database.addReward();
+		$state.go('main.office');
 	};
 };
 
 //login
-function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, database) { 
-	$scope.completed = false;
+function Login_Controller($scope, $state, $modal, $log, $firebase, libraries, database) {
+
+	$scope.initialising = true;
+
+	database.initialise().then(function(response) {
+		switch (response) {
+			case 'user_logged': 
+				$state.go('main.office');
+				$scope.initialising = true;					
+				break;
+			case 'user_new': 
+			case 'user_unlogged':
+				$scope.initialising = false;
+				break;
+		}
+	});
 
 	$scope.login_btn = function(_service) {
-		if ($scope.btnsState != "disabled") {
-			$scope.loading = true;
-			$scope.btnsState = "disabled";
-			database.login(_service);
+		if ($scope.initialising == false) {
+			database.login(_service).then(function(response) {
+				if (response == 'user_new')
+					$state.go('signup');
+				else
+					$state.go('main.office');
+			});
 		}
 	};
-
-	$scope.loading = true;
-	$scope.btnsState = "disabled";
-
-	database.initialise(function(result) {
-		switch (result) {
-			case 0: 
-				$scope.loading = true;
-				$state.go('main.office');
-				break;
-			case 1:
-				if ($scope.completed == false) {
-					//must be a new user!
-					$scope.completed = true;
-					$modal.open({
-						templateUrl: 'page/modal/start/template.html',
-						controller: Modal_Start_Controller,
-						backdrop: 'static',
-						keyboard: false
-					}).result.then(function(agree) { 
-						if (agree === false) {
-							database.logout();
-							$state.go('exit');
-						} else {
-							$modal.open({
-								templateUrl: 'page/modal/newcompany/template.html',
-								controller: Modal_Newcompany_Controller,
-								backdrop: 'static',
-								keyboard: false
-							}).result.then(function(companyname) { 
-								if (companyname === "") {
-									database.logout();
-									$state.go('exit');
-								} else {
-									//set up account hereeeee
-									database.initialSetup(companyname);
-									$state.go('main.office');
-								}
-							});
-						}
-					});
-				}
-				break;
-			case 2:
-				$scope.loading = false;
-				$scope.btnsState = "";
-				break;
-		}
-		$scope.$apply();
-	});
 };
 
 
 
 function Test_Controller($scope, $timeout, libraries, database, messagebox) {
 	
+}
+
+function Signup_Controller($scope, $state, $modal, libraries, database, messagebox) {
+	$scope.ClickDisagree = function() {
+		database.logout();
+		$state.go('exit');
+	}
+
+	$scope.ClickAgree = function() {
+		$modal.open({
+			templateUrl: 'page/modal/newcompany/template.html',
+			controller: Modal_Newcompany_Controller,
+			backdrop: 'static',
+			keyboard: false
+		}).result.then(function(companyname) { 
+			if (companyname === "") {
+				database.logout();
+				$state.go('exit');
+			} else {
+				//set up account hereeeee
+				database.initialSetup(companyname);
+				$state.go('main.office');
+			}
+		});
+	}
 }
 
 
@@ -176,9 +168,9 @@ function Main_Addgame_Controller($scope, $state, libraries, database) {
 
 	$scope.game = {
 		name: "",
-		genre: 0,
-		concept: 0,
-		target: 0
+		genre: "0",
+		concept: "0",
+		target: "0"
 	};
 
 	$scope.isReady = function() {
@@ -249,8 +241,6 @@ function Main_Office_Controller($scope, $state, $timeout, $modal, $log, $firebas
 				database.launchGame();
 		}
 	};
-
-
 
     $scope.slots = new slots(
     	$scope.data.workers, {

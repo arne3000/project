@@ -5,18 +5,52 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-4 col-md-offset-4">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-			    	<h1 class="panel-title text-center">Login</h1>
+		<div class="col-sm-7 hidden-xs">
+			<div class="row">
+				<div class="col-xs-6">
+					<div class="thumbnail">
+						<img src="htdocs/img/screen_01.jpg" alt="screenshot of making profit">
+					</div>
 				</div>
-				<div class="panel-body">
-					<button type="button" class="btn btn-primary btn-lg btn-block {{btnsState}}" ng-click="login_btn('facebook')">Facebook</button>
-					<button type="button" class="btn btn-primary btn-lg btn-block {{btnsState}}" ng-click="login_btn('google')">Google</button>
-					<button type="button" class="btn btn-primary btn-lg btn-block {{btnsState}}" ng-click="login_btn('twitter')">Twitter</button>
+				<div class="col-xs-6">
+					<div class="thumbnail">
+						<img src="htdocs/img/screen_03.jpg" alt="screenshot of a worker">
+					</div>
 				</div>
-				<div ng-show="loading" class="panel-footer">
-			    	<img src="htdocs/img/loading.gif" class="img-responsive center-block loading_anim" alt="Loading...">
+			</div>
+			<div class="row">
+				<div class="col-md-6 hidden-md hidden-sm">
+					<div class="thumbnail">
+						<img src="htdocs/img/screen_02.jpg" alt="screenshot of games studio">
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-12">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							Ever fancied starting your very own games company? No? Well just play this anyway!
+							<br/><br/>
+							Social Game Tycoon lets you make manage a games company, launch games, hire workers and make your millions!
+							<br/><br/>
+							Make some ethically questionable social games and reap the rewards!
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-5 col-xs-12">
+			<div class="row">
+				<div class="panel panel-default">
+				  	<div class="panel-heading text-center">Login / Sign Up</div>
+
+					<ul class="list-group">
+						<li class="list-group-item"><button type="button" class="btn btn-primary btn-block" ng-disabled="initialising" ng-click="login_btn('facebook')">Facebook</button></li>
+						<li class="list-group-item"><button type="button" class="btn btn-danger btn-block"  ng-disabled="initialising" ng-click="login_btn('google')">Google</button></li>
+						<li class="list-group-item"><button type="button" class="btn btn-info btn-block" ng-disabled="initialising" ng-click="login_btn('twitter')">Twitter</button></li>
+					</ul>
+
+					<div ng-show="initialising" class="panel-footer">
+				    	<img src="htdocs/img/loading.gif" class="img-responsive center-block loading_anim" alt="Loading...">
+					</div>
 				</div>
 			</div>
 		</div>

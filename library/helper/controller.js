@@ -206,7 +206,7 @@ var Helper = {
 
 	inGameYear : 86400,
 
-	MONTH : 10,
+	MONTH : 600,
 
 	GetGameDate: function(timestamp) {
 		var time_since = Helper.getUnixTimestamp() - timestamp;
