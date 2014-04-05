@@ -113,6 +113,20 @@ function Main_Controller($scope, $state, $timeout, $modal, $log, $firebase, libr
 		});
 	};
 
+	$scope.showmethemoney = function(value) {
+		if (value <= 1000)
+			return true;
+		else
+			return false;
+	};
+
+	$scope.showmethepremmoney = function(value) {
+		if (value <= 10)
+			return true;
+		else
+			return false;
+	};
+
 	$scope.logout = function() {
 		database.logout();
 		$state.go('login');

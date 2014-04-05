@@ -197,6 +197,38 @@ myapp.factory('metric_service', function MetricService($firebase) {
         PremMoneySpent: function(amount) {
             data.prem_money_used += amount;
             data.$save('prem_money_used');
+        },
+        Login: function() {
+            data.logins += 1;
+            data.$save('logins');
+        },
+        GameCreated: function() {
+            data.games_created += 1;
+            data.$save('games_created');
+        },
+        GameLaunched: function() {
+            data.games_Launched += 1;
+            data.$save('games_Launched');
+        },
+        WorkerHired: function() {
+            data.workers_hired += 1;
+            data.$save('workers_hired');
+        },
+        WorkerFired: function() {
+            data.workers_fired += 1;
+            data.$save('workers_fired');
+        },
+        WorkerUpgraded: function() {
+            data.workers_upgraded += 1;
+            data.$save('workers_upgraded');
+        },
+        JobStarted: function() {
+            data.jobs_started += 1;
+            data.$save('jobs_started');
+        },
+        JobCollected: function() {
+            data.jobs_collected += 1;
+            data.$save('jobs_collected');
         }
     };
 });
@@ -257,6 +289,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
                         deferred.resolve('user_new');
                     }
                     else {
+                        metric_service.Login();
                         initialised = true;
                         deferred.resolve('user_logged');
                     }
@@ -303,6 +336,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
         addWorker: function(slotid, name, level) {
             cost = Levels.toHireCost(level);
             if (data.company.currency >= cost) {
+                metric_service.WorkerHired();
                 data.company.currency -= cost;
                 metric_service.MoneySpent(cost);
                 data.workers.push(Helper.createWorker(slotid, name, level));
@@ -310,6 +344,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
             }
         },
         removeWorker: function(slotid) {
+            metric_service.WorkerFired();
             data.$child("workers").$remove(slotid);
         },
         gamesInDev: function() {
@@ -362,6 +397,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
                     if (data.games[gameID].devProgress >= 100) {
                         data.games[gameID].state = Helper.gameState.launchReady;
                     }
+                    metric_service.JobCollected();
                     data.workers[id].timestamp = 0;
                     data.$save();
                 }
@@ -372,6 +408,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
                 data.workers[id].progress += amount;
                 data.company.currency -= cost;
                 metric_service.MoneySpent(cost);
+                metric_service.WorkerUpgraded();
                 //automatically level up
                 if (data.workers[id].progress >= 100) {
                     ++data.workers[id].level;
@@ -393,6 +430,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
             if (data.company.currency >= cost && data.workers[id].timestamp <= 0 && this.gamesInDev() > 0) {
                 data.company.currency -= cost;
                 metric_service.MoneySpent(cost);
+                metric_service.JobStarted();
                 data.workers[id].timestamp = Helper.getUnixTimestamp();
                 data.$save();
             }
@@ -416,6 +454,7 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
                 data.games = new Array();
 
             if (this.gamesInDev() <= 0) {
+                metric_service.GameCreated();
                 data.games.push(Helper.initGameData(data.games.length, _name, _genre, _concept, _target));
                 data.$save("games");
             }
@@ -442,13 +481,11 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
 
             for (i = 0; i < data.games.length; ++i) {
                 if (data.games[i].state == Helper.gameState.launchReady) {
+                    metric_service.GameLaunched();
                     var new_pop = Helper.GenerateGameStat(30000, 1000, (Levels.data.work.innovation.max * Levels.data.collect.amount), data.games[i].stats.innovation);
                     var new_ppu = Helper.GenerateGameStat(0.4, 0.1, (Levels.data.work.optimisation.max * Levels.data.collect.amount), data.games[i].stats.optimisation);
                     var new_peak = Helper.GenerateGameStat(10000000, 10000, (Levels.data.work.quality.max * Levels.data.collect.amount), data.games[i].stats.quality);
                     var increases = Helper.GetGameGenreIncrease(data.games[i].genre) + Helper.GetGameConceptIncrease(data.games[i].concept) + Helper.GetGameTargettIncrease(data.games[i].target);
-
-                    console.log(new_pop);
-                    console.log(new_peak);
 
                     data.games[i].state = Helper.gameState.active;
                     data.games[i].timeLaunched = Helper.getUnixTimestamp();
@@ -456,8 +493,6 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
                     data.games[i].peak = Math.floor(new_peak + (new_peak * increases));
                     data.games[i].ppu = new_ppu.toFixed(2);;
                     data.games[i].rate = 1.5;
-
-                    console.log(data.games[i]);
                 }
             }
             data.$save("games");
