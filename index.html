@@ -16,12 +16,28 @@
         <link href="htdocs/css/main.css" rel="stylesheet">
 
         <link rel="icon" type="image/png" href="/htdocs/img/icon.png" />
-    </head>
-    <body>
-        <div id="outer_wrap" ui-view></div>        
 
         <!-- JQuery -->
         <script src="htdocs/extlib/jquery-2.0.3.min.js"></script>
+
+        <!-- Facebook -->
+        <script>
+            $(document).ready(function() {
+                $.ajaxSetup({ cache: true });
+
+                $.getScript('//connect.facebook.net/en_UK/all.js', function(){
+                    FB.init({
+                      appId: '742843465743316',
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="fb-root"></div>
+        <div id="outer_wrap" ui-view></div>        
+
+        
         <!-- Angular -->
         <script src="htdocs/extlib/angular.min.js"></script>
         <script src="htdocs/extlib/angular-route.min.js"></script>

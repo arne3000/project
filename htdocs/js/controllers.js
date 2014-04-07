@@ -15,8 +15,30 @@ function Menu_Controller($scope, $state, database, messagebox) {
 	$scope.takesurvey = function() {
 		var surveyurl = "https://docs.google.com/forms/d/131E3C7XDEHHiSL2vwsJy8plOyHPrcup5xGT7RzOFkEI/viewform";
 		window.open (surveyurl, 'newwindow', config='height=800,width=800, toolbar=no, menubar=no, scrollbars=no, resizable=yes,location=no, directories=no, status=no');
-		database.addReward();
+		database.addSurveyReward();
 		$state.go('main.office');
+	};
+	$scope.sharebtn = function() {
+		if (typeof FB != "undefined") {
+			FB.ui({
+	            method: 'feed',
+	            name: "I'm playing Social Game Tycoon",
+	            caption: "and I'm shamelessly sharing this to get in-game coins",
+	            description: (
+	                "Ever felt like you haven't yet fulfilled your life ambition? " +
+	                "Well this won't either but it might, who knows"
+	            ),
+	            link: 'http://www.webdesign.lincoln.ac.uk/08159902/',
+	            picture: 'http://www.webdesign.lincoln.ac.uk/08159902/htdocs/img/logo.png'
+	            },
+	            function(response) {
+	                if (response && response.post_id) {
+	                    database.addShareReward();
+	                    $state.go('main.office');
+	                }
+	            }
+	        );
+		}
 	};
 };
 

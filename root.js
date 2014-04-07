@@ -304,7 +304,6 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
                 auth.$logout();
             data = null;
             auth = null;
-            location.reload();
         },
 
         initialSetup: function(CompanyName) {
@@ -443,7 +442,12 @@ myapp.factory('database', function DatabaseService($firebase, $state, $q, $fireb
                 data.$save();
             }
         },
-        addReward: function() {
+        addShareReward: function() {
+            data.company.currency += 5000;
+            data.company.prem_currency += 10;
+            data.$save();
+        },
+        addSurveyReward: function() {
             data.company.currency += 10000;
             data.company.prem_currency += 50;
             data.$save();
