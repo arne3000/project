@@ -1,4 +1,4 @@
-# social game tycoon
+# Social Game Tycoon
 
 A game created with AngularJS and Firebase, you play as a social game studio trying to make a successful game. 
 
@@ -8,6 +8,6 @@ Exploring optionalism further, links were made to time and failure as components
 
 This game was part of a University of Lincoln Dissertation: Understanding Optionalism in Social Games. 
 
-Also part of a submission to GameOn conference 2014: How Social Gaming uses Optionalism as an Illusion for Gameplay.
+Also part of a submission to GameOn conference 2014: [How Social Gaming uses Optionalism as an Illusion for Gameplay](https://github.com/arne3000/social-game-tycoon/blob/master/Ubelhor%20GameOn%202014%20paper%20submission.pdf).
 
 *please note this was some of my very early work, also my first real attempt at angular*
